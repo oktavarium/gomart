@@ -30,10 +30,7 @@ func loadConfig() (config, error) {
 		return c, fmt.Errorf("unrecognised flags")
 	}
 
-	switch {
-	case len(c.DatabaseURI) == 0:
-		return c, fmt.Errorf("empty database URI")
-	case len(c.AccrualAddress) == 0:
+	if len(c.AccrualAddress) == 0 {
 		return c, fmt.Errorf("empty accrual system address")
 	}
 

@@ -17,7 +17,7 @@ type Server struct {
 
 func NewServer(dbURI, accrualAddr string) (*Server, error) {
 	server := &Server{chi.NewRouter()}
-	storage, err := storage.NewPGStorage(dbURI)
+	storage, err := storage.NewStorage(dbURI)
 	if err != nil {
 		return nil, fmt.Errorf("error on creating storage: %w", err)
 	}

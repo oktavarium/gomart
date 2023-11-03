@@ -3,12 +3,10 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-)
 
-type user struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
+	"github.com/oktavarium/gomart/internal/app/internal/server/handlers/internal/auth"
+	"github.com/oktavarium/gomart/internal/app/internal/server/shared"
+)
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/json" {
@@ -16,27 +14,39 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var u user
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&u); err != nil {
+	var u shared.User
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	ok, err := h.storage.UserExists(u)
+	exists, err := h.storage.UserExists(u)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if ok {
+	if exists {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
-	token, err := h.storage.RegisterUser(u)
+	u.Info, err = auth.GenUserInfo(u)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	if err := h.storage.RegisterUser(u); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	token, err := auth.GenToken(u)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Authorization", token)
+	w.WriteHeader(http.StatusOK)
 }

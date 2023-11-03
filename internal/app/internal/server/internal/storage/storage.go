@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"github.com/oktavarium/gomart/internal/app/internal/server/storage/memory"
-	"github.com/oktavarium/gomart/internal/app/internal/server/storage/pg"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/storage/memory"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/storage/pg"
 )
 
 func NewStorage(dbURI string) (Storage, error) {

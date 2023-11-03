@@ -1,4 +1,4 @@
-package shared
+package model
 
 type User struct {
 	Login    string   `json:"login"`
@@ -7,6 +7,7 @@ type User struct {
 }
 
 type UserInfo struct {
+	UUID string
 	Hash string
 	Salt string
 }

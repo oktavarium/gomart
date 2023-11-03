@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/oktavarium/gomart/internal/app/internal/server/handlers/internal/auth"
-	"github.com/oktavarium/gomart/internal/app/internal/server/shared"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/auth"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
 )
 
-func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") != "application/json" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	var u shared.User
+	var u model.User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -26,18 +26,25 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if exists {
-		w.WriteHeader(http.StatusConflict)
+	if !exists {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	u.Info, err = auth.GenUserInfo(u)
+	u.Info, err = h.storage.UserInfo(u)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	if err := h.storage.RegisterUser(u); err != nil {
+	ok, err := auth.Authorize(u)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 

@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/oktavarium/gomart/internal/app/internal/server/handlers"
-	"github.com/oktavarium/gomart/internal/app/internal/server/storage"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/handlers"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/storage"
 )
 
 var apiPath = "/api/user"

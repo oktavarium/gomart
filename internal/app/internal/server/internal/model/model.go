@@ -20,6 +20,11 @@ type Withdrawals struct {
 	ProcessedAt time.Time `json:"processed_at"`
 }
 
+type Withdraw struct {
+	Order string `json:"number"`
+	Sum   int    `json:"sum"`
+}
+
 type Balance struct {
 	Current   int `json:"current"`
 	Withdrawn int `json:"withdrawn"`

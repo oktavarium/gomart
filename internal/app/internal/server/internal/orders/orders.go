@@ -9,5 +9,10 @@ func NewOrders(storage Storage) *Orders {
 }
 
 func (o *Orders) NewOrder(user, order string) error {
+	order = compressOrderNumber(order)
+	if !checkOrderNumber(order) {
+		return ErrWrongOrderNum
+	}
+
 	return nil
 }

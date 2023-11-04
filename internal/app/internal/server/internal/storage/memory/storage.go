@@ -27,3 +27,7 @@ func (s *Storage) UserHashAndSalt(user string) (string, string, error) {
 func (s *Storage) NewOrder(user, order string) error {
 	return nil
 }
+
+func (s *Storage) GetUserByOrder(order string) (string, error) {
+	return "", nil
+}

@@ -24,3 +24,7 @@ func (s *storage) RegisterUser(u model.User) error {
 func (s *storage) UserInfo(u model.User) (model.UserInfo, error) {
 	return model.UserInfo{}, nil
 }
+
+func (s *storage) NewOrder(user, order string) error {
+	return nil
+}

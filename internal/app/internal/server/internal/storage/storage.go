@@ -2,13 +2,13 @@ package storage
 
 import (
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/storage/memory"
-	"github.com/oktavarium/gomart/internal/app/internal/server/internal/storage/pg"
 )
 
-func NewStorage(dbURI string) (Storage, error) {
-	if len(dbURI) == 0 {
-		return memory.NewStorage(), nil
-	}
+func NewStorage(dbURI string) (*memory.Storage, error) {
+	return memory.NewStorage(), nil
+	// if len(dbURI) == 0 {
 
-	return pg.NewStorage(dbURI)
+	// }
+
+	// return pg.NewStorage(dbURI)
 }

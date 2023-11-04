@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/auth"
@@ -21,34 +21,17 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exists, err := h.storage.UserExists(u)
+	token, err := h.auth.RegisterUser(u.Login, u.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+		switch {
+		case errors.Is(err, auth.ErrEmptyCredentials):
+			w.WriteHeader(http.StatusBadRequest)
+		case errors.Is(err, auth.ErrUserExists):
+			w.WriteHeader(http.StatusConflict)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 
-	if exists {
-		w.WriteHeader(http.StatusConflict)
-		return
-	}
-
-	u.Info, err = auth.GenUserInfo(u)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-
-		fmt.Println(err)
-	}
-
-	if err := h.storage.RegisterUser(u); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(err)
-		return
-	}
-
-	token, err := auth.GenToken(u)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(err)
 		return
 	}
 

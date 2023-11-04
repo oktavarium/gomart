@@ -5,32 +5,27 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
 )
 
 var tokenLifeTime = time.Hour * 24
-var SECRET_KEY = []byte("test")
 
 type claims struct {
 	jwt.RegisteredClaims
-	UserLogin string
+	User string
 }
 
-func GenToken(u model.User) (string, error) {
-	if len(u.Login) == 0 {
-		return "", fmt.Errorf("empty user login")
-	}
+func (a *Auth) generateToken(user string) (string, error) {
 	claims := claims{
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenLifeTime)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
-		u.Login,
+		user,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(SECRET_KEY)
+	ss, err := token.SignedString(a.key)
 	if err != nil {
 		return "", fmt.Errorf("error on signing token: %w", err)
 	}
@@ -38,13 +33,13 @@ func GenToken(u model.User) (string, error) {
 	return ss, nil
 }
 
-func GetLogin(tokenString string) (string, error) {
+func (a *Auth) GetUser(tokenString string) (string, error) {
 	claims := claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
-		return []byte(SECRET_KEY), nil
+		return []byte(a.key), nil
 	})
 
 	if err != nil {
@@ -55,5 +50,14 @@ func GetLogin(tokenString string) (string, error) {
 		return "", fmt.Errorf("token is not valid")
 	}
 
-	return claims.UserLogin, nil
+	exists, err := a.storage.UserExists(claims.User)
+	if err != nil {
+		return "", fmt.Errorf("error on checking user existance: %w", err)
+	}
+
+	if !exists {
+		return "", ErrUserNotExists
+	}
+
+	return claims.User, nil
 }

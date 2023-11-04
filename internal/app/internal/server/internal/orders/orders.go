@@ -25,5 +25,23 @@ func (o *Orders) NewOrder(user, order string) error {
 		return ErrLoadedOrder
 	}
 
+	if len(dbUser) != 0 {
+		return ErrAnotherUserOrder
+	}
+
+	err = o.storage.CreateOrder(user, order)
+	if err != nil {
+		return fmt.Errorf("error creating new order: %w", err)
+	}
+
+	return nil
+}
+
+func (o *Orders) GetOrders(user string) error {
+	orders, err := o.storage.GetOrders(user)
+	if err != nil {
+		return fmt.Errorf("error on getting orders: %w", err)
+	}
+
 	return nil
 }

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -13,12 +12,17 @@ var tokenPrefix = "Bearer "
 
 func (h *Handlers) SecurityMiddleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		var err error
+		defer func() {
+			if err != nil {
+				logger.Error(err)
+			}
+		}()
+
 		tokenString := r.Header.Get("Authorization")
 		token := strings.TrimPrefix(tokenString, tokenPrefix)
 		login, err := h.auth.GetUser(token)
 		if err != nil {
-			err = fmt.Errorf("error on validating token: %w", err)
-			logger.Error(err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

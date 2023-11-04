@@ -26,5 +26,5 @@ func Warn(msg string) {
 }
 
 func Error(err error) {
-	log.Error().Err(err).Msg(err.Error())
+	log.Debug().Msg(err.Error())
 }

@@ -26,7 +26,6 @@ func (h *Handlers) NewOrder(w http.ResponseWriter, r *http.Request) {
 	order, err := io.ReadAll(r.Body)
 	if err != nil {
 		err = fmt.Errorf("error on reading body: %w", err)
-		logger.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

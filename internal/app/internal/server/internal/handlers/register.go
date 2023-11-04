@@ -5,11 +5,19 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/oktavarium/gomart/internal/app/internal/logger"
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/auth"
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
 )
 
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
+	var err error
+	defer func() {
+		if err != nil {
+			logger.Error(err)
+		}
+	}()
+
 	if r.Header.Get("Content-Type") != "application/json" {
 		w.WriteHeader(http.StatusBadRequest)
 		return

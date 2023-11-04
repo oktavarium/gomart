@@ -25,7 +25,7 @@ func (a *Auth) generateToken(user string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(a.key)
+	ss, err := token.SignedString([]byte(a.key))
 	if err != nil {
 		return "", fmt.Errorf("error on signing token: %w", err)
 	}

@@ -11,6 +11,13 @@ import (
 )
 
 func (h *Handlers) NewOrder(w http.ResponseWriter, r *http.Request) {
+	var err error
+	defer func() {
+		if err != nil {
+			logger.Error(err)
+		}
+	}()
+
 	if r.Header.Get("Content-Type") != "text/plain" {
 		w.WriteHeader(http.StatusBadRequest)
 		return

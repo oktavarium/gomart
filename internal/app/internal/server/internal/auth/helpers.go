@@ -33,7 +33,7 @@ func base64ToBytes(s string) ([]byte, error) {
 
 func checkCredentials(creds ...string) bool {
 	for _, c := range creds {
-		if len(c) != 0 {
+		if len(c) == 0 {
 			return false
 		}
 	}

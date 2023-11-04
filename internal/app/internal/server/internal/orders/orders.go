@@ -1,6 +1,10 @@
 package orders
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
+)
 
 type Orders struct {
 	storage Storage
@@ -29,7 +33,7 @@ func (o *Orders) NewOrder(user, order string) error {
 		return ErrAnotherUserOrder
 	}
 
-	err = o.storage.CreateOrder(user, order)
+	err = o.storage.CreateOrder(user, order, string(NEW))
 	if err != nil {
 		return fmt.Errorf("error creating new order: %w", err)
 	}
@@ -37,11 +41,11 @@ func (o *Orders) NewOrder(user, order string) error {
 	return nil
 }
 
-func (o *Orders) GetOrders(user string) error {
+func (o *Orders) GetOrders(user string) ([]model.Order, error) {
 	orders, err := o.storage.GetOrders(user)
 	if err != nil {
-		return fmt.Errorf("error on getting orders: %w", err)
+		return nil, fmt.Errorf("error on getting orders: %w", err)
 	}
 
-	return nil
+	return orders, nil
 }

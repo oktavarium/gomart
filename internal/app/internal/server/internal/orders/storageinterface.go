@@ -6,4 +6,5 @@ type Storage interface {
 	GetUserByOrder(string) (string, error)
 	CreateOrder(string, string, string) error
 	GetOrders(string) ([]model.Order, error)
+	GetBalance(string) (model.Balance, error)
 }

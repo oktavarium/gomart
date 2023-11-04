@@ -63,3 +63,8 @@ func (s *Storage) GetOrders(user string) ([]model.Order, error) {
 
 	return orders, nil
 }
+
+func (s *Storage) GetBalance(user string) (model.Balance, error) {
+	balance := s.users[user].Balance
+	return model.Balance(balance), nil
+}

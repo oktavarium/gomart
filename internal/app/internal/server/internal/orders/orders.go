@@ -49,3 +49,12 @@ func (o *Orders) GetOrders(user string) ([]model.Order, error) {
 
 	return orders, nil
 }
+
+func (o *Orders) GetBalance(user string) (model.Balance, error) {
+	balance, err := o.storage.GetBalance(user)
+	if err != nil {
+		return balance, fmt.Errorf("error on getting balance: %w", err)
+	}
+
+	return balance, nil
+}

@@ -12,7 +12,7 @@ type User struct {
 	Hash        string
 	Salt        string
 	Orders      map[string]Order
-	Withdrawals map[string]Withdrawals
+	Withdrawals []Withdrawals
 	Balance     Balance
 }
 
@@ -21,7 +21,7 @@ func NewUser(hash, salt string) User {
 		Hash:        hash,
 		Salt:        salt,
 		Orders:      make(map[string]Order),
-		Withdrawals: make(map[string]Withdrawals),
+		Withdrawals: make([]Withdrawals, 0),
 	}
 }
 
@@ -32,6 +32,7 @@ type Order struct {
 }
 
 type Withdrawals struct {
+	Order       string
 	Sum         int
 	ProcessedAt time.Time
 }

@@ -21,7 +21,7 @@ func (h *Handlers) SecurityMiddleware(next http.Handler) http.Handler {
 
 		tokenString := r.Header.Get("Authorization")
 		token := strings.TrimPrefix(tokenString, tokenPrefix)
-		login, err := h.auth.GetUser(token)
+		login, err := h.auth.GetUser(r.Context(), token)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return

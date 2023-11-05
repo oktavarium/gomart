@@ -31,10 +31,10 @@ func (h *Handlers) NewOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.Context().Value(UserLogin).(string)
-	err = h.orders.NewOrder(user, string(order))
+	err = h.orders.NewOrder(r.Context(), user, string(order))
 	if err != nil {
 		switch {
-		case errors.Is(err, orders.ErrWrongOrderNum):
+		case errors.Is(err, orders.ErrWrongOrderNumber):
 			w.WriteHeader(http.StatusUnprocessableEntity)
 		case errors.Is(err, orders.ErrAnotherUserOrder):
 			w.WriteHeader(http.StatusConflict)

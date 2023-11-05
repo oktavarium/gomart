@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/oktavarium/gomart/internal/app/internal/logger"
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
+	"github.com/oktavarium/gomart/internal/app/internal/server/internal/orders"
 )
 
 func (h *Handlers) Withdraw(w http.ResponseWriter, r *http.Request) {
@@ -21,8 +23,8 @@ func (h *Handlers) Withdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var withdraw model.Withdraw
-	err = json.NewDecoder(r.Body).Decode(&withdraw)
+	var withdrawal model.Withdrawal
+	err = json.NewDecoder(r.Body).Decode(&withdrawal)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -30,5 +32,19 @@ func (h *Handlers) Withdraw(w http.ResponseWriter, r *http.Request) {
 
 	user := r.Context().Value(UserLogin).(string)
 
-	h.orders.Withdraw(user, withdraw)
+	err = h.orders.Withdraw(r.Context(), user, withdrawal.Order, withdrawal.Sum)
+	if err != nil {
+		switch {
+		case errors.Is(err, orders.ErrWrongOrderNumber):
+			w.WriteHeader(http.StatusUnprocessableEntity)
+		case errors.Is(err, orders.ErrNotEnoughBalance):
+			w.WriteHeader(http.StatusPaymentRequired)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

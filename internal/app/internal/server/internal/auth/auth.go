@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 
@@ -19,12 +20,12 @@ func NewAuth(key string, storage Storage) *Auth {
 	return &Auth{key, storage}
 }
 
-func (a *Auth) RegisterUser(user, password string) (string, error) {
+func (a *Auth) RegisterUser(ctx context.Context, user, password string) (string, error) {
 	if !checkCredentials(user, password) {
 		return "", ErrEmptyCredentials
 	}
 
-	exists, err := a.storage.UserExists(user)
+	exists, err := a.storage.UserExists(ctx, user)
 	if err != nil {
 		return "", fmt.Errorf("error on checking user existance: %w", err)
 	}
@@ -37,7 +38,7 @@ func (a *Auth) RegisterUser(user, password string) (string, error) {
 		return "", fmt.Errorf("error on generating user hash and salt: %w", err)
 	}
 
-	if err := a.storage.RegisterUser(user, hash, salt); err != nil {
+	if err := a.storage.RegisterUser(ctx, user, hash, salt); err != nil {
 		return "", fmt.Errorf("error on registering user in storage: %w", err)
 	}
 
@@ -49,12 +50,12 @@ func (a *Auth) RegisterUser(user, password string) (string, error) {
 	return token, nil
 }
 
-func (a *Auth) Authorize(user, password string) (string, error) {
+func (a *Auth) Authorize(ctx context.Context, user, password string) (string, error) {
 	if !checkCredentials(user, password) {
 		return "", ErrEmptyCredentials
 	}
 
-	exists, err := a.storage.UserExists(user)
+	exists, err := a.storage.UserExists(ctx, user)
 	if err != nil {
 		return "", fmt.Errorf("error on checking user existance: %w", err)
 	}
@@ -62,7 +63,7 @@ func (a *Auth) Authorize(user, password string) (string, error) {
 		return "", ErrUserExists
 	}
 
-	storedHash, storedSalt, err := a.storage.UserHashAndSalt(user)
+	storedHash, storedSalt, err := a.storage.UserHashAndSalt(ctx, user)
 	if err != nil {
 		return "", fmt.Errorf("error on getting user hash and salt from storage: %w", err)
 	}

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -33,7 +34,7 @@ func (a *Auth) generateToken(user string) (string, error) {
 	return ss, nil
 }
 
-func (a *Auth) GetUser(tokenString string) (string, error) {
+func (a *Auth) GetUser(ctx context.Context, tokenString string) (string, error) {
 	claims := &claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -50,7 +51,7 @@ func (a *Auth) GetUser(tokenString string) (string, error) {
 		return "", fmt.Errorf("token is not valid")
 	}
 
-	exists, err := a.storage.UserExists(claims.User)
+	exists, err := a.storage.UserExists(ctx, claims.User)
 	if err != nil {
 		return "", fmt.Errorf("error on checking user existance: %w", err)
 	}

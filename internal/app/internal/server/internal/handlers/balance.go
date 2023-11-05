@@ -16,7 +16,7 @@ func (h *Handlers) Balance(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	balance, err := h.orders.GetBalance(user)
+	balance, err := h.orders.GetBalance(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -28,4 +28,6 @@ func (h *Handlers) Balance(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 }

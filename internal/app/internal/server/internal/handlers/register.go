@@ -29,7 +29,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.auth.RegisterUser(u.Login, u.Password)
+	token, err := h.auth.RegisterUser(r.Context(), u.Login, u.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, auth.ErrEmptyCredentials):

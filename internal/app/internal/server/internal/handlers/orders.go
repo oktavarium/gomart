@@ -16,7 +16,7 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	orders, err := h.orders.GetOrders(user)
+	orders, err := h.orders.GetOrders(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -33,4 +33,6 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 }

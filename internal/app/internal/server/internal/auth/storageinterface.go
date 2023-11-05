@@ -1,7 +1,9 @@
 package auth
 
+import "context"
+
 type Storage interface {
-	UserExists(string) (bool, error)
-	RegisterUser(string, string, string) error
-	UserHashAndSalt(string) (string, string, error)
+	UserExists(context.Context, string) (bool, error)
+	RegisterUser(context.Context, string, string, string) error
+	UserHashAndSalt(context.Context, string) (string, string, error)
 }

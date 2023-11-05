@@ -18,6 +18,11 @@ func (h *Handlers) Withdrawals(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(UserLogin).(string)
 	withdrawls, err := h.orders.GetWithdrawals(r.Context(), user)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if len(withdrawls) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}

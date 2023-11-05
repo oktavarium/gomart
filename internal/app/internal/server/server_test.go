@@ -66,6 +66,16 @@ func TestServer(t *testing.T) {
 			"",
 			true,
 		},
+		{"post order",
+			"POST",
+			"text/plain",
+			token,
+			"/api/user/orders",
+			"12345678903",
+			202,
+			"",
+			true,
+		},
 		{"get orders",
 			"GET",
 			"text/plain",
@@ -75,6 +85,36 @@ func TestServer(t *testing.T) {
 			200,
 			"",
 			false,
+		},
+		{"get balance",
+			"GET",
+			"text/plain",
+			token,
+			"/api/user/balance",
+			"",
+			200,
+			"",
+			false,
+		},
+		{"withdraw",
+			"POST",
+			"application/json",
+			token,
+			"/api/user/balance/withdraw",
+			model.Withdrawal{Order: "2377225624", Sum: 751},
+			402,
+			"",
+			true,
+		},
+		{"get withdrawals",
+			"GET",
+			"text/plain",
+			token,
+			"/api/user/withdrawals",
+			"",
+			204,
+			"",
+			true,
 		},
 	}
 
@@ -119,10 +159,10 @@ func testRequest(
 
 	resp, err := ts.Client().Do(req)
 	require.NoError(t, err)
-	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
+	defer resp.Body.Close()
 
 	responseToken := resp.Header.Get("Authorization")
 

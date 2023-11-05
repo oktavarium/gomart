@@ -17,7 +17,7 @@ type Auth struct {
 }
 
 func NewAuth(key string, storage Storage) *Auth {
-	return &Auth{key, storage}
+	return &Auth{key: key, storage: storage}
 }
 
 func (a *Auth) RegisterUser(ctx context.Context, user, password string) (string, error) {

@@ -29,3 +29,9 @@ type Balance struct {
 	Current   int `json:"current"`
 	Withdrawn int `json:"withdrawn"`
 }
+
+type Points struct {
+	Order   string `json:"order"`
+	Status  string `json:"status"`
+	Accrual *int   `json:"accrual,omitempty"`
+}

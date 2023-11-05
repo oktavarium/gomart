@@ -25,9 +25,8 @@ func NewServer(dbURI, accrualAddr, key string) (*Server, error) {
 	}
 
 	auth := auth.NewAuth(key, storage)
-	orders := orders.NewOrders(storage)
-
-	handlers := handlers.NewHandlers(auth, orders, accrualAddr)
+	orders := orders.NewOrders(storage, accrualAddr)
+	handlers := handlers.NewHandlers(auth, orders)
 
 	server.Route(apiPath, func(r chi.Router) {
 		r.Use(handlers.LoggerMiddleware)

@@ -11,8 +11,9 @@ type Orders struct {
 	storage Storage
 }
 
-func NewOrders(storage Storage) *Orders {
-	return &Orders{storage}
+func NewOrders(storage Storage, accuralAddr string) *Orders {
+	orders := &Orders{storage}
+	return orders
 }
 
 func (o *Orders) CreateOrder(ctx context.Context, user, order string) error {

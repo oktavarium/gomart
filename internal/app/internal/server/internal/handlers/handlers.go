@@ -6,11 +6,13 @@ import (
 )
 
 type Handlers struct {
-	auth        *auth.Auth
-	orders      *orders.Orders
-	accrualAddr string
+	auth   *auth.Auth
+	orders *orders.Orders
 }
 
-func NewHandlers(a *auth.Auth, o *orders.Orders, accuralAddr string) *Handlers {
-	return &Handlers{a, o, accuralAddr}
+func NewHandlers(a *auth.Auth, o *orders.Orders) *Handlers {
+	return &Handlers{
+		auth:   a,
+		orders: o,
+	}
 }

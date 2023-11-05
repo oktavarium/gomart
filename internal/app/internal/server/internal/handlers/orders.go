@@ -27,8 +27,7 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(orders)
+	err = json.NewEncoder(w).Encode(orders)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

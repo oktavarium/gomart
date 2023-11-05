@@ -31,7 +31,7 @@ func (h *Handlers) NewOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.Context().Value(UserLogin).(string)
-	err = h.orders.NewOrder(r.Context(), user, string(order))
+	err = h.orders.CreateOrder(r.Context(), user, string(order))
 	if err != nil {
 		switch {
 		case errors.Is(err, orders.ErrWrongOrderNumber):

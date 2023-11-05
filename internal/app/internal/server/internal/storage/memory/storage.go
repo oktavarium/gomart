@@ -37,7 +37,7 @@ func (s *Storage) CreateOrder(ctx context.Context, user, number, status string) 
 		Accrual:    nil,
 		UploadedAt: time.Now(),
 	}
-
+	fmt.Println(s.users)
 	return nil
 }
 
@@ -62,7 +62,7 @@ func (s *Storage) GetOrders(ctx context.Context, user string) ([]model.Order, er
 
 		orders = append(orders, order)
 	}
-
+	fmt.Println(s.users)
 	return orders, nil
 }
 

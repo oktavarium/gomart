@@ -22,7 +22,7 @@ func (h *Handlers) Withdrawals(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(&withdrawls)
+	err = json.NewEncoder(w).Encode(withdrawls)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}

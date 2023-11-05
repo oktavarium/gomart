@@ -15,7 +15,7 @@ func NewOrders(storage Storage) *Orders {
 	return &Orders{storage}
 }
 
-func (o *Orders) NewOrder(ctx context.Context, user, order string) error {
+func (o *Orders) CreateOrder(ctx context.Context, user, order string) error {
 	order = compressOrderNumber(order)
 	if !checkOrderNumber(order) {
 		return ErrWrongOrderNumber

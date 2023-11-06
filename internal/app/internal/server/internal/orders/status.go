@@ -1,6 +1,6 @@
 package orders
 
-type status string
+type status = string
 
 const (
 	NEW        status = "NEW"

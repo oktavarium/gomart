@@ -18,6 +18,22 @@ func NewAccruals(accrualAddr string) *Accruals {
 	return &Accruals{accrualAddr: accrualAddr}
 }
 
+func (a *Accruals) NewExecutor(orders <-chan string, bufferSize int) <-chan model.Points {
+	outCh := make(chan model.Points, bufferSize)
+
+	go func() {
+		for order := range orders {
+			points, err := a.getPoints(order)
+			if err != nil {
+				continue
+			}
+			outCh <- points
+		}
+	}()
+
+	return outCh
+}
+
 func (a *Accruals) getPoints(order string) (model.Points, error) {
 	var points model.Points
 

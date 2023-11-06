@@ -40,6 +40,20 @@ func (s *Storage) CreateOrder(ctx context.Context, user, number, status string) 
 	return nil
 }
 
+func (s *Storage) UpdateOrder(ctx context.Context, number, status string, accrual *int) error {
+	for user, data := range s.users {
+		if order, ok := data.Orders[number]; ok {
+			order.Status = status
+			order.Accrual = accrual
+
+			s.users[user].Orders[number] = order
+			return nil
+		}
+	}
+
+	return nil
+}
+
 func (s *Storage) GetUserByOrder(ctx context.Context, number string) (string, error) {
 	for k, v := range s.users {
 		if _, ok := v.Orders[number]; ok {

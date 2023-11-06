@@ -1,4 +1,4 @@
-package orders
+package accruals
 
 type status = string
 

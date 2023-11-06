@@ -11,7 +11,7 @@ CREATE TABLE "orders" (
     "id" bigserial PRIMARY KEY,
     "user_id" bigint NOT NULL,
     "number" varchar NOT NULL,
-    "status" varchar NOT NULL,
+    "status" varchar NOT NULL DEFAULT ('NEW'),
     "accural" bigint,
     "uploaded_at" timestamptz NOT NULL DEFAULT (now())
 );

@@ -16,7 +16,7 @@ func (h *Handlers) Balance(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	balance, err := h.orders.GetBalance(r.Context(), user)
+	balance, err := h.orders.Balance(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

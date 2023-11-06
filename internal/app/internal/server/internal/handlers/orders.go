@@ -16,7 +16,7 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	orders, err := h.orders.GetOrders(r.Context(), user)
+	orders, err := h.orders.Orders(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

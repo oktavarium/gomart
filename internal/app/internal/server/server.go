@@ -17,6 +17,8 @@ type Server struct {
 	*chi.Mux
 }
 
+var defaultBufferize uint = 10
+
 func NewServer(dbURI, accrualAddr, key string) (*Server, error) {
 	server := &Server{chi.NewRouter()}
 	storage, err := storage.NewStorage(dbURI)
@@ -25,7 +27,7 @@ func NewServer(dbURI, accrualAddr, key string) (*Server, error) {
 	}
 
 	auth := auth.NewAuth(key, storage)
-	orders := orders.NewOrders(storage, accrualAddr)
+	orders := orders.NewOrders(accrualAddr, storage, defaultBufferize)
 	handlers := handlers.NewHandlers(auth, orders)
 
 	server.Route(apiPath, func(r chi.Router) {

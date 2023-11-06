@@ -7,11 +7,11 @@ import (
 )
 
 type Storage interface {
-	GetUserByOrder(context.Context, string) (string, error)
-	CreateOrder(context.Context, string, string, string) error
+	UserByOrder(context.Context, string) (string, error)
+	NewOrder(context.Context, string, string) error
 	UpdateOrder(context.Context, string, string, *int) error
-	GetOrders(context.Context, string) ([]model.Order, error)
-	GetBalance(context.Context, string) (model.Balance, error)
+	Orders(context.Context, string) ([]model.Order, error)
+	Balance(context.Context, string) (model.Balance, error)
 	Withdraw(context.Context, string, string, int) error
-	GetWithdrawals(context.Context, string) ([]model.Withdrawals, error)
+	Withdrawals(context.Context, string) ([]model.Withdrawals, error)
 }

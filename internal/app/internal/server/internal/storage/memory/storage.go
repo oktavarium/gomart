@@ -31,9 +31,9 @@ func (s *Storage) UserHashAndSalt(ctx context.Context, user string) (string, str
 	return u.Hash, u.Salt, nil
 }
 
-func (s *Storage) CreateOrder(ctx context.Context, user, number, status string) error {
+func (s *Storage) NewOrder(ctx context.Context, user, number string) error {
 	s.users[user].Orders[number] = Order{
-		Status:     status,
+		Status:     "NEW",
 		Accrual:    nil,
 		UploadedAt: time.Now(),
 	}
@@ -54,7 +54,7 @@ func (s *Storage) UpdateOrder(ctx context.Context, number, status string, accrua
 	return nil
 }
 
-func (s *Storage) GetUserByOrder(ctx context.Context, number string) (string, error) {
+func (s *Storage) UserByOrder(ctx context.Context, number string) (string, error) {
 	for k, v := range s.users {
 		if _, ok := v.Orders[number]; ok {
 			return k, nil
@@ -63,7 +63,7 @@ func (s *Storage) GetUserByOrder(ctx context.Context, number string) (string, er
 	return "", nil
 }
 
-func (s *Storage) GetOrders(ctx context.Context, user string) ([]model.Order, error) {
+func (s *Storage) Orders(ctx context.Context, user string) ([]model.Order, error) {
 	orders := make([]model.Order, 0, len(s.users[user].Orders))
 	for k, v := range s.users[user].Orders {
 		order := model.Order{
@@ -86,7 +86,7 @@ func (s *Storage) ChekUserOrder(ctx context.Context, user, order string) error {
 	return nil
 }
 
-func (s *Storage) GetBalance(ctx context.Context, user string) (model.Balance, error) {
+func (s *Storage) Balance(ctx context.Context, user string) (model.Balance, error) {
 	balance := s.users[user].Balance
 	return model.Balance(balance), nil
 }
@@ -101,6 +101,6 @@ func (s *Storage) Withdraw(ctx context.Context, user, order string, sum int) err
 	return nil
 }
 
-func (s *Storage) GetWithdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
+func (s *Storage) Withdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
 	return nil, nil
 }

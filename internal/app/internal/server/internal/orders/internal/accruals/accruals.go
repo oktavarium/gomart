@@ -1,29 +1,41 @@
 package accruals
 
 import (
+	"context"
 	"fmt"
-	"net/http"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
 )
 
 var accrualPath = "/api/orders"
+var defaultBufferize uint = 10
 
 type Accruals struct {
 	accrualAddr string
+	storage     Storage
 }
 
-func NewAccruals(accrualAddr string) *Accruals {
-	return &Accruals{accrualAddr: accrualAddr}
+func NewAccruals(accrualAddr string, storage Storage, ordersCh <-chan string, bufferSize uint) *Accruals {
+	accruals := &Accruals{
+		accrualAddr: accrualAddr,
+		storage:     storage,
+	}
+
+	pointsCh := accruals.startExecutor(ordersCh, bufferSize)
+	accruals.startUpdater(pointsCh)
+
+	return accruals
 }
 
-func (a *Accruals) NewExecutor(orders <-chan string, bufferSize int) <-chan model.Points {
+func (a *Accruals) startExecutor(orders <-chan string, bufferSize uint) <-chan model.Points {
+	if bufferSize == 0 {
+		bufferSize = defaultBufferize
+	}
 	outCh := make(chan model.Points, bufferSize)
 
 	go func() {
 		for order := range orders {
-			points, err := a.getPoints(order)
+			points, err := getPoints(order)
 			if err != nil {
 				continue
 			}
@@ -34,24 +46,16 @@ func (a *Accruals) NewExecutor(orders <-chan string, bufferSize int) <-chan mode
 	return outCh
 }
 
-func (a *Accruals) getPoints(order string) (model.Points, error) {
-	var points model.Points
-
-	client := resty.New()
-	request := client.R().SetResult(&points)
-	resp, err := request.Get(fmt.Sprintf("%s/%s", accrualPath, order))
-	if err != nil {
-		return points, fmt.Errorf("error on getting points from accrual system: %w", err)
-	}
-
-	switch resp.StatusCode() {
-	case http.StatusNoContent:
-		return points, ErrNotRegistered
-	case http.StatusTooManyRequests:
-		return points, ErrTooManyRequests
-	case http.StatusInternalServerError:
-		return points, ErrAccrualSystemError
-	}
-
-	return points, nil
+func (a *Accruals) startUpdater(pointsCh <-chan model.Points) {
+	go func() {
+		for points := range pointsCh {
+			if points.Status == REGISTERED || points.Status == PROCESSING {
+				points.Status = PROCESSING
+				err := a.storage.UpdateOrder(context.TODO(), points.Order, points.Status, points.Accrual)
+				if err != nil {
+					fmt.Println("SOME ERROR ON UPDATING POINTS")
+				}
+			}
+		}
+	}()
 }

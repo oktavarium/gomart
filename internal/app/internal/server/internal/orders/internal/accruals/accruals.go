@@ -3,12 +3,14 @@ package accruals
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/oktavarium/gomart/internal/app/internal/server/internal/model"
 )
 
 var accrualPath = "/api/orders"
 var defaultBufferize uint = 10
+var defaultRequesterInterval = 1 * time.Second
 
 type Accruals struct {
 	accrualAddr string
@@ -34,12 +36,15 @@ func (a *Accruals) startExecutor(orders <-chan string, bufferSize uint) <-chan m
 	outCh := make(chan model.Points, bufferSize)
 
 	go func() {
-		for order := range orders {
-			points, err := getPoints(order)
-			if err != nil {
-				continue
+		ticker := time.NewTicker(defaultRequesterInterval)
+		for range ticker.C {
+			if order, ok := <-orders; ok {
+				points, err := getPoints(order)
+				if err != nil {
+					continue
+				}
+				outCh <- points
 			}
-			outCh <- points
 		}
 	}()
 

@@ -6,4 +6,5 @@ type Configer interface {
 	AccrualAddress() string
 	LogLevel() string
 	SecretKey() string
+	BufferSize() uint
 }

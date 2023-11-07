@@ -49,13 +49,13 @@ func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
 	}
 
 	sp.authenticator = auth.NewAuth(sp.logger, sp.configer.DatabaseURI(), sp.storager)
-	sp.orderer = orders.NewOrders(sp.logger, sp.storager, 10)
+	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.storager, sp.configer.BufferSize())
 	sp.accruer = accruals.NewAccruals(
 		ctx,
 		sp.configer.AccrualAddress(),
 		sp.storager,
 		sp.orderer.OrdersChan(),
-		10,
+		sp.configer.BufferSize(),
 	)
 	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticator, sp.orderer)
 	sp.router = chirouter.NewRouter(sp.logger, sp.configer.Address(), sp.handler)

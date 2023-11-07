@@ -8,40 +8,46 @@ import (
 )
 
 type config struct {
-	address        string `env:"RUN_ADDRESS"`                      // адрес и порт запуска сервиса
-	databaseURI    string `env:"DATABASE_URI"`                     // адрес подключения к базе данных
-	accrualAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`           // адрес системы расчёта начислений
-	logLevel       string `env:"LOG_LEVEL"`                        // уровень логирования сервиса
-	secretKey      string `env:"SECRET_KEY" envDefault:"test_key"` // ключ для подписывания токена
+	CAddress        string `env:"RUN_ADDRESS"`                      // адрес и порт запуска сервиса
+	CDatabaseURI    string `env:"DATABASE_URI"`                     // адрес подключения к базе данных
+	CAccrualAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`           // адрес системы расчёта начислений
+	CLogLevel       string `env:"LOG_LEVEL"`                        // уровень логирования сервиса
+	CSecretKey      string `env:"SECRET_KEY" envDefault:"test_key"` // ключ для подписывания токена
+	CBufferSize     uint   `env:"BUFFER_SIZE" envDefault:"100"`     // размер буфферов для обработки
 }
 
 func (c *config) Address() string {
-	return c.address
+	return c.CAddress
 }
 
 func (c *config) DatabaseURI() string {
-	return c.databaseURI
+	return c.CDatabaseURI
 }
 
 func (c *config) AccrualAddress() string {
-	return c.accrualAddress
+	return c.CAccrualAddress
 }
 
 func (c *config) LogLevel() string {
-	return c.logLevel
+	return c.CLogLevel
 }
 
 func (c *config) SecretKey() string {
-	return c.secretKey
+	return c.CSecretKey
+}
+
+func (c *config) BufferSize() uint {
+	return c.CBufferSize
 }
 
 func NewConfig() (*config, error) {
 	var c config
 
-	flag.StringVar(&c.address, "a", "localhost:80", "listen address in notation address:port")
-	flag.StringVar(&c.databaseURI, "d", "", "database connection string")
-	flag.StringVar(&c.accrualAddress, "r", "", "accrual system address")
-	flag.StringVar(&c.logLevel, "l", "debug", "logger debug level")
+	flag.StringVar(&c.CAddress, "a", "localhost:80", "listen address in notation address:port")
+	flag.StringVar(&c.CDatabaseURI, "d", "", "database connection string")
+	flag.StringVar(&c.CAccrualAddress, "r", "", "accrual system address")
+	flag.StringVar(&c.CLogLevel, "l", "debug", "logger debug level")
+	flag.UintVar(&c.CBufferSize, "b", 100, "default buffer size")
 
 	flag.Parse()
 
@@ -53,7 +59,7 @@ func NewConfig() (*config, error) {
 		return nil, fmt.Errorf("unrecognised flags")
 	}
 
-	if len(c.accrualAddress) == 0 {
+	if len(c.CAccrualAddress) == 0 {
 		return nil, fmt.Errorf("empty accrual system address")
 	}
 

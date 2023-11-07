@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/oktavarium/gomart/internal/app"
 	"github.com/oktavarium/gomart/internal/app/internal/model"
+	"github.com/oktavarium/gomart/internal/app/internal/storager"
 )
 
 var accrualPath = "/api/orders"
@@ -14,12 +14,21 @@ var defaultBufferize uint = 10
 var defaultRequesterInterval = 1 * time.Second
 
 type Accruals struct {
+	ctx         context.Context
 	accrualAddr string
-	storage     app.Storage
+	storage     storager.Storager
 }
 
-func NewAccruals(accrualAddr string, storage app.Storage, ordersCh <-chan string, bufferSize uint) *Accruals {
+func NewAccruals(
+	ctx context.Context,
+	accrualAddr string,
+	storage storager.Storager,
+	ordersCh <-chan string,
+	bufferSize uint,
+) *Accruals {
+
 	accruals := &Accruals{
+		ctx:         ctx,
 		accrualAddr: accrualAddr,
 		storage:     storage,
 	}

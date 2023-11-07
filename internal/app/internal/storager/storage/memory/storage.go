@@ -14,8 +14,8 @@ type Storage struct {
 	users  Users
 }
 
-func NewStorage(logger logger.Logger) *Storage {
-	return &Storage{logger: logger, users: NewUsers()}
+func NewStorage(logger logger.Logger) (*Storage, error) {
+	return &Storage{logger: logger, users: NewUsers()}, nil
 }
 
 func (s *Storage) UserExists(ctx context.Context, user string) (bool, error) {

@@ -1,8 +1,11 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/oktavarium/gomart/internal/app/internal/accruer"
+	"github.com/oktavarium/gomart/internal/app/internal/accruer/accruals"
 	"github.com/oktavarium/gomart/internal/app/internal/authenticator"
 	"github.com/oktavarium/gomart/internal/app/internal/authenticator/auth"
 	"github.com/oktavarium/gomart/internal/app/internal/configer"
@@ -25,11 +28,12 @@ type ServiceProvider struct {
 	storager      storager.Storager
 	authenticator authenticator.Authenticator
 	orderer       orderer.Orderer
+	accruer       accruer.Accruer
 	handler       handler.Handler
 	router        router.Router
 }
 
-func NewServiceProvider() (*ServiceProvider, error) {
+func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
 	sp := new(ServiceProvider)
 	var err error
 
@@ -39,9 +43,20 @@ func NewServiceProvider() (*ServiceProvider, error) {
 	}
 
 	sp.logger = log.NewLogger(sp.configer.LogLevel())
-	sp.storager = memory.NewStorage(sp.logger)
+	sp.storager, err = memory.NewStorage(sp.logger)
+	if err != nil {
+		return nil, fmt.Errorf("error on creating config: %w", err)
+	}
+
 	sp.authenticator = auth.NewAuth(sp.logger, sp.configer.DatabaseURI(), sp.storager)
 	sp.orderer = orders.NewOrders(sp.logger, sp.storager, 10)
+	sp.accruer = accruals.NewAccruals(
+		ctx,
+		sp.configer.AccrualAddress(),
+		sp.storager,
+		sp.orderer.OrdersChan(),
+		10,
+	)
 	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticator, sp.orderer)
 	sp.router = chirouter.NewRouter(sp.logger, sp.configer.Address(), sp.handler)
 

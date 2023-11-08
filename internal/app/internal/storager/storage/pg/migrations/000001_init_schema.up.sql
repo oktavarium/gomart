@@ -4,7 +4,7 @@ CREATE TABLE "users" (
     "user" varchar NOT NULL,
     "hash" varchar NOT NULL,
     "salt" varchar NOT NULL,
-    "balance" bigint NOT NULL
+    "balance" bigint NOT NULL DEFAULT(0)
 );
 
 CREATE TABLE "orders" (

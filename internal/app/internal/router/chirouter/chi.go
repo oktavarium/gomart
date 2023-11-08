@@ -1,7 +1,9 @@
 package chirouter
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/oktavarium/gomart/internal/app/internal/handler"
@@ -12,11 +14,18 @@ var apiPath = "/api/user"
 
 type ChiRouter struct {
 	*chi.Mux
+	ctx    context.Context
 	addr   string
 	logger logger.Logger
 }
 
-func NewRouter(logger logger.Logger, addr string, handler handler.Handler) *ChiRouter {
+func NewRouter(
+	ctx context.Context,
+	logger logger.Logger,
+	addr string,
+	handler handler.Handler,
+) *ChiRouter {
+
 	server := &ChiRouter{
 		Mux:    chi.NewRouter(),
 		addr:   addr,
@@ -51,5 +60,13 @@ func NewRouter(logger logger.Logger, addr string, handler handler.Handler) *ChiR
 }
 
 func (s *ChiRouter) Run() error {
-	return http.ListenAndServe(s.addr, s)
+	server := &http.Server{Addr: s.addr, Handler: s}
+	go func() {
+		<-s.ctx.Done()
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		server.Shutdown(ctx)
+	}()
+
+	return server.ListenAndServe()
 }

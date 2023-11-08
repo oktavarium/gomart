@@ -45,20 +45,25 @@ func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
 	sp.logger = log.NewLogger(sp.configer.LogLevel())
 	sp.storager, err = memory.NewStorage(sp.logger)
 	if err != nil {
-		return nil, fmt.Errorf("error on creating config: %w", err)
+		return nil, fmt.Errorf("error on creating storage: %w", err)
 	}
 
 	sp.authenticator = auth.NewAuth(sp.logger, sp.configer.DatabaseURI(), sp.storager)
 	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.storager, sp.configer.BufferSize())
-	sp.accruer = accruals.NewAccruals(
+	sp.accruer, err = accruals.NewAccruals(
 		ctx,
+		sp.logger,
 		sp.configer.AccrualAddress(),
 		sp.storager,
 		sp.orderer.OrdersChan(),
 		sp.configer.BufferSize(),
 	)
+	if err != nil {
+		return nil, fmt.Errorf("error on creating accruer: %w", err)
+	}
+
 	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticator, sp.orderer)
-	sp.router = chirouter.NewRouter(sp.logger, sp.configer.Address(), sp.handler)
+	sp.router = chirouter.NewRouter(ctx, sp.logger, sp.configer.Address(), sp.handler)
 
 	return sp, nil
 }

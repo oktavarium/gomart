@@ -65,7 +65,7 @@ func (s *Storage) UserByOrder(ctx context.Context, number string) (string, error
 	return "", nil
 }
 
-func (s *Storage) Orders(ctx context.Context, user string, status ...string) ([]model.Order, error) {
+func (s *Storage) Orders(ctx context.Context, user string) ([]model.Order, error) {
 	orders := make([]model.Order, 0, len(s.users[user].Orders))
 	for k, v := range s.users[user].Orders {
 		order := model.Order{
@@ -78,6 +78,10 @@ func (s *Storage) Orders(ctx context.Context, user string, status ...string) ([]
 		orders = append(orders, order)
 	}
 	return orders, nil
+}
+
+func (s *Storage) OrdersByStatus(ctx context.Context, statuses []string) ([]string, error) {
+	return nil, nil
 }
 
 func (s *Storage) ChekUserOrder(ctx context.Context, user, order string) error {

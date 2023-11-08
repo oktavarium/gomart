@@ -65,6 +65,7 @@ func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error
 	if err != nil {
 		return orders, fmt.Errorf("error on selecting values: %w", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var order model.Order
@@ -89,6 +90,7 @@ func (s *storage) OrdersByStatus(ctx context.Context, statuses []string) ([]stri
 	if err != nil {
 		return orders, fmt.Errorf("error on selecting values: %w", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var order string

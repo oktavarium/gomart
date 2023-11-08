@@ -76,6 +76,8 @@ func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdra
 		return withdrawals, fmt.Errorf("error on selecting values: %w", err)
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var w model.Withdrawals
 		if err := rows.Scan(&w.Order, &w.Sum, &w.ProcessedAt); err != nil {

@@ -19,7 +19,7 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/router"
 	"github.com/oktavarium/gomart/internal/app/internal/router/chirouter"
 	"github.com/oktavarium/gomart/internal/app/internal/storager"
-	"github.com/oktavarium/gomart/internal/app/internal/storager/storage/memory"
+	"github.com/oktavarium/gomart/internal/app/internal/storager/storage/pg"
 )
 
 type ServiceProvider struct {
@@ -43,7 +43,7 @@ func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
 	}
 
 	sp.logger = log.NewLogger(sp.configer.LogLevel())
-	sp.storager, err = memory.NewStorage(sp.logger)
+	sp.storager, err = pg.NewStorage(ctx, sp.logger, sp.configer.DatabaseURI())
 	if err != nil {
 		return nil, fmt.Errorf("error on creating storage: %w", err)
 	}

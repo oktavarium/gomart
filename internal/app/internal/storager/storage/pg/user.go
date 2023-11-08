@@ -26,19 +26,16 @@ func (s *storage) RegisterUser(ctx context.Context, user, hash, salt string) err
 		return fmt.Errorf("error on making insert: %w", err)
 	}
 
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("error on tx commit: %w", err)
+	}
+
 	return nil
 }
 
 func (s *storage) UserHashAndSalt(ctx context.Context, user string) (string, string, error) {
 	var hash, salt string
-
-	tx, err := s.Begin(ctx)
-	if err != nil {
-		return hash, salt, fmt.Errorf("error on begin tx: %w", err)
-	}
-	defer tx.Rollback(ctx)
-
-	row := tx.QueryRow(
+	row := s.QueryRow(
 		ctx,
 		`SELECT hash, salt FROM users WHERE user = $1`,
 		user,
@@ -53,16 +50,10 @@ func (s *storage) UserHashAndSalt(ctx context.Context, user string) (string, str
 
 func (s *storage) UserByOrder(ctx context.Context, number string) (string, error) {
 	var user string
-
-	tx, err := s.Begin(ctx)
-	if err != nil {
-		return user, fmt.Errorf("error on begin tx: %w", err)
-	}
-
-	row := tx.QueryRow(
+	row := s.QueryRow(
 		ctx,
 		`SELECT users.user FROM orders
-	LEFT JOIN users ON users.id = orders.user_id
+	INNER JOIN users ON users.id = orders.user_id
 	WHERE orders.number = $1`,
 		number,
 	)
@@ -72,4 +63,15 @@ func (s *storage) UserByOrder(ctx context.Context, number string) (string, error
 	}
 
 	return user, nil
+}
+
+func (s *storage) userId(ctx context.Context, user string) (string, error) {
+	var userId string
+	row := s.QueryRow(ctx, `SELECT id FROM users WHERE user = $1`, user)
+
+	if err := row.Scan(&userId); err != nil {
+		return userId, fmt.Errorf("error on scanning values: %w", err)
+	}
+
+	return userId, nil
 }

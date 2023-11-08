@@ -5,6 +5,7 @@ CREATE TABLE "users" (
     "hash" varchar NOT NULL,
     "salt" varchar NOT NULL,
     "balance" bigint NOT NULL DEFAULT(0)
+    "withdrawn" bigint NOT NULL DEFAULT(0)
 );
 
 CREATE TABLE "orders" (
@@ -12,11 +13,11 @@ CREATE TABLE "orders" (
     "user_id" bigint NOT NULL,
     "number" varchar NOT NULL,
     "status" varchar NOT NULL DEFAULT ('NEW'),
-    "accural" bigint,
+    "accrual" bigint,
     "uploaded_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "withdrawns" (
+CREATE TABLE "withdrawals" (
     "id" bigserial PRIMARY KEY,
     "user_id" bigint NOT NULL,
     "order_id" varchar NOT NULL,

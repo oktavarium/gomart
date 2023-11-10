@@ -16,12 +16,12 @@ func (s *storage) NewOrder(ctx context.Context, user, number string) error {
 	}
 	defer tx.Rollback(ctx)
 
-	userId, err := s.userId(ctx, user)
+	userID, err := s.userID(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
 
-	_, err = tx.Exec(ctx, `INSERT INTO orders (user_id, number) VALUES ($1, $2)`, userId, number)
+	_, err = tx.Exec(ctx, `INSERT INTO orders (user_id, number) VALUES ($1, $2)`, userID, number)
 	if err != nil {
 		return fmt.Errorf("error on inserting values: %w", err)
 	}
@@ -108,13 +108,13 @@ func (s *storage) OrdersByStatus(ctx context.Context, statuses []string) ([]stri
 }
 
 func (s *storage) ChekUserOrder(ctx context.Context, user, order string) error {
-	userId, err := s.userId(ctx, user)
+	userID, err := s.userID(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
 
 	var id string
-	row := s.QueryRow(ctx, `SELECT id FROM orders WHERE user_id = $1, number = $2`, userId, order)
+	row := s.QueryRow(ctx, `SELECT id FROM orders WHERE user_id = $1, number = $2`, userID, order)
 	err = row.Scan(&id)
 	if err != nil {
 		if err != pgx.ErrNoRows {

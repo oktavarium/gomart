@@ -78,13 +78,13 @@ func (s *storage) UserByOrder(ctx context.Context, number string) (string, error
 	return user, nil
 }
 
-func (s *storage) userId(ctx context.Context, user string) (string, error) {
-	var userId string
+func (s *storage) userID(ctx context.Context, user string) (string, error) {
+	var userID string
 	row := s.QueryRow(ctx, `SELECT id FROM users WHERE name = $1`, user)
 
-	if err := row.Scan(&userId); err != nil {
-		return userId, fmt.Errorf("error on scanning values: %w", err)
+	if err := row.Scan(&userID); err != nil {
+		return userID, fmt.Errorf("error on scanning values: %w", err)
 	}
 
-	return userId, nil
+	return userID, nil
 }

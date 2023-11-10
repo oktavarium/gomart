@@ -28,6 +28,7 @@ func NewRouter(
 
 	server := &ChiRouter{
 		Mux:    chi.NewRouter(),
+		ctx:    ctx,
 		addr:   addr,
 		logger: logger,
 	}

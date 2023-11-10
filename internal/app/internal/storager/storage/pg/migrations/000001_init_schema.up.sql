@@ -1,11 +1,11 @@
 
 CREATE TABLE "users" (
     "id" bigserial PRIMARY KEY,
-    "user" varchar NOT NULL,
+    "name" varchar NOT NULL,
     "hash" varchar NOT NULL,
     "salt" varchar NOT NULL,
-    "balance" bigint NOT NULL DEFAULT(0)
-    "withdrawn" bigint NOT NULL DEFAULT(0)
+    "balance" bigint NOT NULL DEFAULT 0,
+    "withdrawn" bigint NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "orders" (
@@ -20,12 +20,12 @@ CREATE TABLE "orders" (
 CREATE TABLE "withdrawals" (
     "id" bigserial PRIMARY KEY,
     "user_id" bigint NOT NULL,
-    "order_id" varchar NOT NULL,
+    "order_id" bigint NOT NULL,
     "sum" bigint NOT NULL,
     "processed_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-ALTER TABLE "withdrawns" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-ALTER TABLE "withdrawns" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+ALTER TABLE "withdrawals" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "withdrawals" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 

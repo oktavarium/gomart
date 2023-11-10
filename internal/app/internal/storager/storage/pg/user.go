@@ -3,9 +3,22 @@ package pg
 import (
 	"context"
 	"fmt"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func (s *storage) UserExists(ctx context.Context, user string) (bool, error) {
+	var id string
+	row := s.QueryRow(ctx, `SELECT id FROM users WHERE user = $1`, user)
+	err := row.Scan(&id)
+	if err != nil {
+		if err != pgx.ErrNoRows {
+			return false, fmt.Errorf("error on selecting values: %w", err)
+		} else {
+			return false, nil
+		}
+	}
+
 	return true, nil
 }
 
@@ -18,7 +31,7 @@ func (s *storage) RegisterUser(ctx context.Context, user, hash, salt string) err
 
 	if _, err := tx.Exec(
 		ctx,
-		`INSERT INTO users (user, hash, salt) VALUES ($1, $1, $3)`,
+		`INSERT INTO users (name, hash, salt) VALUES ($1, $2, $3)`,
 		user,
 		hash,
 		salt,
@@ -37,7 +50,7 @@ func (s *storage) UserHashAndSalt(ctx context.Context, user string) (string, str
 	var hash, salt string
 	row := s.QueryRow(
 		ctx,
-		`SELECT hash, salt FROM users WHERE user = $1`,
+		`SELECT hash, salt FROM users WHERE name = $1`,
 		user,
 	)
 
@@ -52,7 +65,7 @@ func (s *storage) UserByOrder(ctx context.Context, number string) (string, error
 	var user string
 	row := s.QueryRow(
 		ctx,
-		`SELECT users.user FROM orders
+		`SELECT users.name FROM orders
 	INNER JOIN users ON users.id = orders.user_id
 	WHERE orders.number = $1`,
 		number,
@@ -67,7 +80,7 @@ func (s *storage) UserByOrder(ctx context.Context, number string) (string, error
 
 func (s *storage) userId(ctx context.Context, user string) (string, error) {
 	var userId string
-	row := s.QueryRow(ctx, `SELECT id FROM users WHERE user = $1`, user)
+	row := s.QueryRow(ctx, `SELECT id FROM users WHERE name = $1`, user)
 
 	if err := row.Scan(&userId); err != nil {
 		return userId, fmt.Errorf("error on scanning values: %w", err)

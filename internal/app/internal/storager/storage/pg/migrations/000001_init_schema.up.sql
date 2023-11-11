@@ -20,7 +20,7 @@ CREATE TABLE "orders" (
 CREATE TABLE "withdrawals" (
     "id" bigserial PRIMARY KEY,
     "user_id" bigint NOT NULL,
-    "order" varchar NOT NULL,
+    "number" varchar NOT NULL,
     "sum" real NOT NULL,
     "processed_at" timestamptz NOT NULL DEFAULT (now())
 );

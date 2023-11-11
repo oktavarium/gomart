@@ -30,7 +30,7 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32)
 
 	if _, err = tx.Exec(
 		ctx,
-		`INSERT INTO withdrawals (user_id, order, sum) VALUES ($1, $2, $3)`,
+		`INSERT INTO withdrawals (user_id, number, sum) VALUES ($1, $2, $3)`,
 		userID,
 		order,
 		sum,
@@ -62,7 +62,7 @@ func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdra
 
 	rows, err := s.Query(
 		ctx,
-		`SELECT order, sum, processed_at FROM withdrawals WHERE user_id = $1`,
+		`SELECT number, sum, processed_at FROM withdrawals WHERE user_id = $1`,
 		userID,
 	)
 	if err != nil {

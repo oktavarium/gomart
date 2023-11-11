@@ -74,7 +74,16 @@ func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrua
 
 func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error) {
 	orders := make([]model.Order, 0)
-	rows, err := s.Query(ctx, `SELECT number, status, accrual, uploaded_at FROM orders`)
+	userID, err := s.userID(ctx, user)
+	if err != nil {
+		return orders, fmt.Errorf("error on getting userID: %w", err)
+	}
+
+	rows, err := s.Query(
+		ctx,
+		`SELECT number, status, accrual, uploaded_at FROM orders WHERE user_id = $1`,
+		userID,
+	)
 	if err != nil {
 		return orders, fmt.Errorf("error on selecting values: %w", err)
 	}

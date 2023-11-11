@@ -57,6 +57,7 @@ func (o *Orders) Balance(ctx context.Context, user string) (model.Balance, error
 func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) error {
 	order = compressOrderNumber(order)
 	if !checkOrderNumber(order) {
+		fmt.Println(order)
 		return ErrWrongOrderNumber
 	}
 

@@ -62,8 +62,7 @@ func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdra
 
 	rows, err := s.Query(
 		ctx,
-		`SELECT order, sum, processed_at FROM withdrawals
-		 WHERE user_id = $1`,
+		`SELECT order, sum, processed_at FROM withdrawals WHERE user_id = $1`,
 		userID,
 	)
 	if err != nil {

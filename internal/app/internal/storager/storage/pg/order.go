@@ -125,13 +125,13 @@ func (s *storage) ChekUserOrder(ctx context.Context, user, order string) error {
 	return nil
 }
 
-func (s *storage) orderId(ctx context.Context, number string) (string, error) {
-	var orderId string
+func (s *storage) orderID(ctx context.Context, number string) (string, error) {
+	var orderID string
 	row := s.QueryRow(ctx, `SELECT id FROM orders WHERE number = $1`, number)
 
-	if err := row.Scan(&orderId); err != nil {
-		return orderId, fmt.Errorf("error on scanning values: %w", err)
+	if err := row.Scan(&orderID); err != nil {
+		return orderID, fmt.Errorf("error on scanning values: %w", err)
 	}
 
-	return orderId, nil
+	return orderID, nil
 }

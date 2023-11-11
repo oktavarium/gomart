@@ -28,7 +28,7 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum int) err
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
 
-	orderId, err := s.orderId(ctx, order)
+	orderID, err := s.orderID(ctx, order)
 	if err != nil {
 		return fmt.Errorf("error on getting order id: %w", err)
 	}
@@ -37,7 +37,7 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum int) err
 		ctx,
 		`INSERT INTO withdrawals (user_id, order_id, sum) VALUES ($1, $2, $3)`,
 		userID,
-		orderId,
+		orderID,
 		sum,
 	); err != nil {
 		return fmt.Errorf("error on inserting values: %w", err)

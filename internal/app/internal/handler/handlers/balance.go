@@ -20,12 +20,11 @@ func (h *Handlers) Balance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(balance)
+	w.Header().Set("Content-Type", "application/json")
+
+	err = json.NewEncoder(w).Encode(balance)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 }

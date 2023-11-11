@@ -25,6 +25,8 @@ func (h *Handlers) Withdrawals(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+
 	err = json.NewEncoder(w).Encode(withdrawls)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

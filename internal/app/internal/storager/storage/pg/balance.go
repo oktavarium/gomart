@@ -28,16 +28,11 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32)
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
 
-	orderID, err := s.orderID(ctx, order)
-	if err != nil {
-		return fmt.Errorf("error on getting order id: %w", err)
-	}
-
 	if _, err = tx.Exec(
 		ctx,
-		`INSERT INTO withdrawals (user_id, order_id, sum) VALUES ($1, $2, $3)`,
+		`INSERT INTO withdrawals (user_id, order, sum) VALUES ($1, $2, $3)`,
 		userID,
-		orderID,
+		order,
 		sum,
 	); err != nil {
 		return fmt.Errorf("error on inserting values: %w", err)
@@ -67,9 +62,8 @@ func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdra
 
 	rows, err := s.Query(
 		ctx,
-		`SELECT orders.number, withdrawals.sum, withdrawals.processed_at FROM withdrawals
-		INNER JOIN orders ON orders.id = withdrawals.order_id
-		 WHERE withdrawals.user_id = $1`,
+		`SELECT order, sum, processed_at FROM withdrawals
+		 WHERE user_id = $1`,
 		userID,
 	)
 	if err != nil {

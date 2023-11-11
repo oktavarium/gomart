@@ -77,5 +77,10 @@ func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) 
 }
 
 func (o *Orders) Withdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
-	return nil, nil
+	withdrawals, err := o.storage.Withdrawals(ctx, user)
+	if err != nil {
+		return nil, fmt.Errorf("error on getting withdrawals: %w", err)
+	}
+
+	return withdrawals, nil
 }

@@ -20,12 +20,10 @@ CREATE TABLE "orders" (
 CREATE TABLE "withdrawals" (
     "id" bigserial PRIMARY KEY,
     "user_id" bigint NOT NULL,
-    "order_id" bigint NOT NULL,
+    "order" varchar NOT NULL,
     "sum" real NOT NULL,
     "processed_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 ALTER TABLE "withdrawals" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-ALTER TABLE "withdrawals" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
-

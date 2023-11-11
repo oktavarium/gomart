@@ -61,7 +61,7 @@ func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrua
 
 func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error) {
 	orders := make([]model.Order, 0)
-	rows, err := s.Query(ctx, `SELECT * FROM orders`)
+	rows, err := s.Query(ctx, `SELECT number, status, accrual, uploaded_at FROM orders`)
 	if err != nil {
 		return orders, fmt.Errorf("error on selecting values: %w", err)
 	}
@@ -69,7 +69,8 @@ func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error
 
 	for rows.Next() {
 		var order model.Order
-		if err := rows.Scan(&order); err != nil {
+		err := rows.Scan(&order.Order, &order.Status, &order.Accrual, &order.UploadedAt)
+		if err != nil {
 			return orders, fmt.Errorf("error on scanning values: %w", err)
 		}
 		orders = append(orders, order)

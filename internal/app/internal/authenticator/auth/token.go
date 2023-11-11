@@ -3,12 +3,14 @@ package auth
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
 
 var tokenLifeTime = time.Hour * 24
+var tokenPrefix = "Bearer "
 
 type claims struct {
 	jwt.RegisteredClaims
@@ -36,12 +38,16 @@ func (a *Auth) generateToken(user string) (string, error) {
 
 func (a *Auth) GetUser(ctx context.Context, tokenString string) (string, error) {
 	claims := &claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
-		return []byte(a.key), nil
-	})
+	token, err := jwt.ParseWithClaims(
+		strings.TrimPrefix(tokenString, tokenPrefix),
+		claims,
+		func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			}
+			return []byte(a.key), nil
+		},
+	)
 
 	if err != nil {
 		return "", fmt.Errorf("error on parsing token: %w", err)

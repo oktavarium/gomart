@@ -3,10 +3,7 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"strings"
 )
-
-var tokenPrefix = "Bearer "
 
 func (h *Handlers) SecurityMiddleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
@@ -17,8 +14,7 @@ func (h *Handlers) SecurityMiddleware(next http.Handler) http.Handler {
 			}
 		}()
 
-		tokenString := r.Header.Get("Authorization")
-		token := strings.TrimPrefix(tokenString, tokenPrefix)
+		token := r.Header.Get("Authorization")
 		login, err := h.authenticator.GetUser(r.Context(), token)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)

@@ -62,7 +62,8 @@ func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdra
 
 	rows, err := s.Query(
 		ctx,
-		`SELECT number, sum, processed_at FROM withdrawals WHERE user_id = $1`,
+		`SELECT number, sum, processed_at FROM withdrawals WHERE user_id = $1
+		ORDER BY processed_at DESC`,
 		userID,
 	)
 	if err != nil {
@@ -81,7 +82,7 @@ func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdra
 	}
 
 	if err := rows.Err(); err != nil {
-		return withdrawals, fmt.Errorf("error on selecting values: %w", err)
+		return nil, fmt.Errorf("error on selecting values: %w", err)
 	}
 
 	return withdrawals, nil

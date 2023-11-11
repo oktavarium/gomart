@@ -62,8 +62,8 @@ func (a *Auth) Authorize(ctx context.Context, user, password string) (string, er
 	if err != nil {
 		return "", fmt.Errorf("error on checking user existance: %w", err)
 	}
-	if exists {
-		return "", ErrUserExists
+	if !exists {
+		return "", ErrNotAuthorized
 	}
 
 	storedHash, storedSalt, err := a.storage.UserHashAndSalt(ctx, user)

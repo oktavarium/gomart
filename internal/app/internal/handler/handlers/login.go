@@ -33,8 +33,6 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, auth.ErrEmptyCredentials):
 			w.WriteHeader(http.StatusBadRequest)
-		case errors.Is(err, auth.ErrUserExists):
-			w.WriteHeader(http.StatusConflict)
 		case errors.Is(err, auth.ErrNotAuthorized):
 			w.WriteHeader(http.StatusUnauthorized)
 		default:

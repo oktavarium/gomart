@@ -13,7 +13,7 @@ CREATE TABLE "orders" (
     "user_id" bigint NOT NULL,
     "number" varchar NOT NULL,
     "status" varchar NOT NULL DEFAULT ('NEW'),
-    "accrual" real,
+    "accrual" real NOT NULL DEFAULT 0,
     "uploaded_at" timestamptz NOT NULL DEFAULT (now())
 );
 

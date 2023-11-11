@@ -71,7 +71,7 @@ func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) 
 	}
 
 	if err := o.storage.Withdraw(ctx, user, order, sum); err != nil {
-		return fmt.Errorf("error on withdrawal")
+		return fmt.Errorf("error on withdrawal: %w", err)
 	}
 
 	return nil

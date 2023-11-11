@@ -7,8 +7,10 @@ RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o gophermart cmd/gophermart/main.go
 
 FROM scratch as run
-ENV ACCRUAL_ADDR: "localhost:8081"
-ENV DB_URI: "postgres://user:test@localhost:5432/market?sslmode=disable"
-ENV GOPHERMART_ADDR: "localhost:8080"
-COPY --from=build /src/gophermart /run/gophermart
-CMD ["/run/gophermart", "-a", ACCRUAL_ADDR, "-d", DB_URI, "-r", GOPHERMART_ADDR]
+EXPOSE 8080
+ENV ACCRUAL_SYSTEM_ADDRESS = "localhost:8081"
+ENV DATABASE_URI = "postgresql://user:user@postgres:5432/market?sslmode=disable"
+ENV RUN_ADDRESS = "0.0.0.0:8080"
+COPY --from=build /src/gophermart .
+ENTRYPOINT ["/gophermart"]
+

@@ -3,9 +3,9 @@ version: "3.9"
 services:
   base:
     environment:
-      ACCRUAL_ADDR: "localhost:8081"
-      GOPHERMATH_ADDR: "localhost:8080"
+      ACCRUAL_SYSTEM_ADDRESS: "localhost:8081"
+      RUN_ADDRESS: "0.0.0.0:8080"
       POSTGRES_DB: "market"
       POSTGRES_USER: "user"
       POSTGRES_PASSWORD: "user"
-      DB_URI: "postgres://user:test@localhost:5432/market?sslmode=disable"
+      DATABASE_URI: "postgresql://user:user@postgres:5432/market?sslmode=disable"

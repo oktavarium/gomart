@@ -7,24 +7,21 @@ services:
       service: base
     ports:
       - "5432:5432"
-  accrual:
-    build:
-      context: .
-      dockerfile: deployments/accrual.dockerfile
-    extends:
-      file: deployments/base.yml
-      service: base
-    # command: sleep infinity
+    healthcheck:
+        test: ["CMD", "psql", $DATABASE_URI]
+        interval: 3s
+        timeout: 1s
+        retries: 5
   gophermart:
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
     build:
       context: .
       dockerfile: deployments/gophermart.dockerfile
     extends:
       file: deployments/base.yml
       service: base
-    # command: sleep infinity
-  # client:
-  #   build:
-  #     context: .
-  #     dockerfile: client.dockerfile
-  #   command: sleep infinity
+

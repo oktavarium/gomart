@@ -10,28 +10,28 @@ type User struct {
 type Order struct {
 	Order      string    `json:"number"`
 	Status     string    `json:"status"`
-	Accrual    *int      `json:"accrual,omitempty"`
+	Accrual    float32   `json:"accrual"`
 	UploadedAt time.Time `json:"uploaded_at"`
 }
 
 type Withdrawals struct {
 	Order       string    `json:"number"`
-	Sum         int       `json:"sum"`
+	Sum         float32   `json:"sum"`
 	ProcessedAt time.Time `json:"processed_at"`
 }
 
 type Withdrawal struct {
-	Order string `json:"number"`
-	Sum   int    `json:"sum"`
+	Order string  `json:"number"`
+	Sum   float32 `json:"sum"`
 }
 
 type Balance struct {
-	Current   int `json:"current"`
-	Withdrawn int `json:"withdrawn"`
+	Current   float32 `json:"current"`
+	Withdrawn float32 `json:"withdrawn"`
 }
 
 type Points struct {
-	Order   string `json:"order"`
-	Status  string `json:"status"`
-	Accrual *int   `json:"accrual,omitempty"`
+	Order   string  `json:"order"`
+	Status  string  `json:"status"`
+	Accrual float32 `json:"accrual"`
 }

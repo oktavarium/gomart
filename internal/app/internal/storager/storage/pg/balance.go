@@ -17,7 +17,7 @@ func (s *storage) Balance(ctx context.Context, user string) (model.Balance, erro
 	return model.Balance(balance), nil
 }
 
-func (s *storage) Withdraw(ctx context.Context, user, order string, sum int) error {
+func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32) error {
 	tx, err := s.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)

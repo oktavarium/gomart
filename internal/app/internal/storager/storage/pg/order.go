@@ -33,7 +33,7 @@ func (s *storage) NewOrder(ctx context.Context, user, number string) error {
 	return nil
 }
 
-func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrual *int) error {
+func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrual float32) error {
 	tx, err := s.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
@@ -44,7 +44,7 @@ func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrua
 		ctx,
 		`UPDATE orders SET status = $1, accrual = $2 WHERE number = $3`,
 		status,
-		*accrual,
+		accrual,
 		number,
 	)
 

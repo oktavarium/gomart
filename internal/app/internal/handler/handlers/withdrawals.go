@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -27,7 +26,6 @@ func (h *Handlers) Withdrawals(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println(withdrawls)
 	err = json.NewEncoder(w).Encode(withdrawls)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

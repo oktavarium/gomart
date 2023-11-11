@@ -9,7 +9,7 @@ import (
 
 func (s *storage) Balance(ctx context.Context, user string) (model.Balance, error) {
 	var balance model.Balance
-	row := s.QueryRow(ctx, `SELECT balance, withdrawn FROM user WHERE user = $1`, user)
+	row := s.QueryRow(ctx, `SELECT balance, withdrawn FROM users WHERE name = $1`, user)
 	if err := row.Scan(&balance.Current, &balance.Withdrawn); err != nil {
 		return balance, fmt.Errorf("error on selecting values: %w", err)
 	}

@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/caarlos0/env"
 )
@@ -63,7 +64,9 @@ func NewConfig() (*config, error) {
 		return nil, fmt.Errorf("empty accrual system address")
 	}
 
-	c.CAccrualAddress = "http://" + c.CAccrualAddress
+	if !strings.Contains(c.AccrualAddress(), "http") {
+		c.CAccrualAddress = "http://" + c.CAccrualAddress
+	}
 
 	return &c, nil
 }

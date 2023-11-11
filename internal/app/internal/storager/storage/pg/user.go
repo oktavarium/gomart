@@ -9,7 +9,7 @@ import (
 
 func (s *storage) UserExists(ctx context.Context, user string) (bool, error) {
 	var id string
-	row := s.QueryRow(ctx, `SELECT id FROM users WHERE user = $1`, user)
+	row := s.QueryRow(ctx, `SELECT id FROM users WHERE name = $1`, user)
 	err := row.Scan(&id)
 	if err != nil {
 		if err != pgx.ErrNoRows {
@@ -72,7 +72,12 @@ func (s *storage) UserByOrder(ctx context.Context, number string) (string, error
 	)
 
 	if err := row.Scan(&user); err != nil {
-		return user, fmt.Errorf("error on scanning values: %w", err)
+		if err != pgx.ErrNoRows {
+			return user, fmt.Errorf("error on scanning values: %w", err)
+		} else {
+			return user, nil
+		}
+
 	}
 
 	return user, nil

@@ -77,6 +77,10 @@ func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error
 	}
 
 	if err := rows.Err(); err != nil {
+		if err == pgx.ErrNoRows {
+			return orders, nil
+		}
+
 		return orders, fmt.Errorf("error on selectins values: %w", err)
 	}
 

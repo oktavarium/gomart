@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13.3
+    extends:
+      file: deployments/base.yml
+      service: base
+    ports:
+      - "5432:5432"
+  accrual:
+    build:
+      context: .
+      dockerfile: deployments/accrual.dockerfile
+    extends:
+      file: deployments/base.yml
+      service: base
+    # command: sleep infinity
+  gophermart:
+    build:
+      context: .
+      dockerfile: deployments/gophermart.dockerfile
+    extends:
+      file: deployments/base.yml
+      service: base
+    # command: sleep infinity
+  # client:
+  #   build:
+  #     context: .
+  #     dockerfile: client.dockerfile
+  #   command: sleep infinity

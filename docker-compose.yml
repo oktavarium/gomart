@@ -13,8 +13,10 @@ services:
         timeout: 1s
         retries: 5
   gophermart:
+    image: market
     ports:
       - "8080:8080"
+      - "8888:8888"
     depends_on:
       postgres:
         condition: service_healthy

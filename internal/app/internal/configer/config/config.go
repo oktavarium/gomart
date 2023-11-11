@@ -63,5 +63,7 @@ func NewConfig() (*config, error) {
 		return nil, fmt.Errorf("empty accrual system address")
 	}
 
+	c.CAccrualAddress = "http://" + c.CAccrualAddress
+
 	return &c, nil
 }

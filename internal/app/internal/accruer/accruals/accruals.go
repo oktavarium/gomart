@@ -8,7 +8,7 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/storager"
 )
 
-var accrualPath = "/api/orders"
+var accrualPath = "api/orders"
 var defaultBufferize uint = 10
 var defaultRequestInterval = 1 * time.Second
 

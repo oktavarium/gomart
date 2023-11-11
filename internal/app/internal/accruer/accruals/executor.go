@@ -23,8 +23,9 @@ func (a *Accruals) startExecutor(orders <-chan string, bufferSize uint) <-chan m
 				return
 			default:
 				if order, ok := <-orders; ok {
-					points, err := getPoints(order)
+					points, err := a.getPoints(order)
 					if err != nil {
+						a.logger.Error(err)
 						continue
 					}
 					outCh <- points

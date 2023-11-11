@@ -34,11 +34,24 @@ func (s *storage) NewOrder(ctx context.Context, user, number string) error {
 }
 
 func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrual float32) error {
+	s.logger.Info("UpdateOrder")
 	tx, err := s.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
 	defer tx.Rollback(ctx)
+
+	//	if status == "PROCESSED"
+
+	user, err := s.UserByOrder(ctx, number)
+	if err != nil {
+		return fmt.Errorf("error on getting user by order: %w", err)
+	}
+
+	_, err = tx.Exec(ctx, `UPDATE users SET balance = balance + $1 WHERE name = $2`, accrual, user)
+	if err != nil {
+		return fmt.Errorf("error on updating user balance %w", err)
+	}
 
 	_, err = tx.Exec(
 		ctx,

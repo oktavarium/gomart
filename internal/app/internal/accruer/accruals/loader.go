@@ -26,6 +26,7 @@ func (a *Accruals) startLoader(ctx context.Context, bufferSize uint) <-chan stri
 				close(outCh)
 				return
 			default:
+				a.logger.Info("LOADING PROCESSING MESSAGES")
 				unproccessedOrders, err := a.storage.OrdersByStatus(ctx, []string{PROCESSING})
 				if err != nil {
 					a.logger.Error(fmt.Errorf("error on getting orders by status: %w", err))

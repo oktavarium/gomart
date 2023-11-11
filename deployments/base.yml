@@ -3,7 +3,7 @@ version: "3.9"
 services:
   base:
     environment:
-      ACCRUAL_SYSTEM_ADDRESS: "localhost:8081"
+      ACCRUAL_SYSTEM_ADDRESS: "192.168.1.52:8888"
       RUN_ADDRESS: "0.0.0.0:8080"
       POSTGRES_DB: "market"
       POSTGRES_USER: "user"

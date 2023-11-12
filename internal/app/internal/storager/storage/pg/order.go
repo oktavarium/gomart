@@ -34,14 +34,11 @@ func (s *storage) NewOrder(ctx context.Context, user, number string) error {
 }
 
 func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrual float32) error {
-	s.logger.Info("UpdateOrder")
 	tx, err := s.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
 	defer tx.Rollback(ctx)
-
-	//	if status == "PROCESSED"
 
 	user, err := s.UserByOrder(ctx, number)
 	if err != nil {
@@ -150,15 +147,4 @@ func (s *storage) ChekUserOrder(ctx context.Context, user, order string) error {
 	}
 
 	return nil
-}
-
-func (s *storage) orderID(ctx context.Context, number string) (string, error) {
-	var orderID string
-	row := s.QueryRow(ctx, `SELECT id FROM orders WHERE number = $1`, number)
-
-	if err := row.Scan(&orderID); err != nil {
-		return orderID, fmt.Errorf("error on scanning values: %w", err)
-	}
-
-	return orderID, nil
 }

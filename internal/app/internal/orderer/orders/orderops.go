@@ -7,13 +7,13 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/model"
 )
 
-func (o *Orders) NewOrder(ctx context.Context, user, order string) error {
+func (o *Orders) MakeOrder(ctx context.Context, user, order string) error {
 	order = compressOrderNumber(order)
 	if !checkOrderNumber(order) {
 		return ErrWrongOrderNumber
 	}
 
-	dbUser, err := o.storage.UserByOrder(ctx, order)
+	dbUser, err := o.storage.GetUserByOrder(ctx, order)
 	if err != nil {
 		return fmt.Errorf("error on getting user by order: %w", err)
 	}
@@ -26,7 +26,7 @@ func (o *Orders) NewOrder(ctx context.Context, user, order string) error {
 		return ErrAnotherUserOrder
 	}
 
-	err = o.storage.NewOrder(ctx, user, order)
+	err = o.storage.MakeOrder(ctx, user, order)
 	if err != nil {
 		return fmt.Errorf("error creating new order: %w", err)
 	}
@@ -36,8 +36,8 @@ func (o *Orders) NewOrder(ctx context.Context, user, order string) error {
 	return nil
 }
 
-func (o *Orders) Orders(ctx context.Context, user string) ([]model.Order, error) {
-	orders, err := o.storage.Orders(ctx, user)
+func (o *Orders) GetOrders(ctx context.Context, user string) ([]model.Order, error) {
+	orders, err := o.storage.GetOrders(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("error on getting orders: %w", err)
 	}
@@ -45,8 +45,8 @@ func (o *Orders) Orders(ctx context.Context, user string) ([]model.Order, error)
 	return orders, nil
 }
 
-func (o *Orders) Balance(ctx context.Context, user string) (model.Balance, error) {
-	balance, err := o.storage.Balance(ctx, user)
+func (o *Orders) GetBalance(ctx context.Context, user string) (model.Balance, error) {
+	balance, err := o.storage.GetBalance(ctx, user)
 	if err != nil {
 		return balance, fmt.Errorf("error on getting balance: %w", err)
 	}
@@ -60,7 +60,7 @@ func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) 
 		return ErrWrongOrderNumber
 	}
 
-	balance, err := o.storage.Balance(ctx, user)
+	balance, err := o.storage.GetBalance(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting balance: %w", err)
 	}
@@ -76,8 +76,8 @@ func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) 
 	return nil
 }
 
-func (o *Orders) Withdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
-	withdrawals, err := o.storage.Withdrawals(ctx, user)
+func (o *Orders) GetWithdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
+	withdrawals, err := o.storage.GetWithdrawals(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("error on getting withdrawals: %w", err)
 	}

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handlers) Withdrawals(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetWithdrawals(w http.ResponseWriter, r *http.Request) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -14,7 +14,7 @@ func (h *Handlers) Withdrawals(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	withdrawls, err := h.orderer.Withdrawals(r.Context(), user)
+	withdrawls, err := h.orderer.GetWithdrawals(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

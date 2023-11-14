@@ -6,8 +6,8 @@ import (
 
 	"github.com/oktavarium/gomart/internal/app/internal/accruer"
 	"github.com/oktavarium/gomart/internal/app/internal/accruer/accruals"
-	"github.com/oktavarium/gomart/internal/app/internal/authenticator"
-	"github.com/oktavarium/gomart/internal/app/internal/authenticator/auth"
+	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer"
+	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer/authenticator"
 	"github.com/oktavarium/gomart/internal/app/internal/configer"
 	"github.com/oktavarium/gomart/internal/app/internal/configer/config"
 	"github.com/oktavarium/gomart/internal/app/internal/handler"
@@ -26,7 +26,7 @@ type ServiceProvider struct {
 	configer      configer.Configer
 	logger        logger.Logger
 	storager      storager.Storager
-	authenticator authenticator.Authenticator
+	authenticator authenticatorer.Authenticatorer
 	orderer       orderer.Orderer
 	accruer       accruer.Accruer
 	handler       handler.Handler
@@ -48,7 +48,7 @@ func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
 		return nil, fmt.Errorf("error on creating storage: %w", err)
 	}
 
-	sp.authenticator = auth.NewAuth(sp.logger, sp.configer.DatabaseURI(), sp.storager)
+	sp.authenticator = authenticator.NewAuthenticator(sp.logger, sp.configer.DatabaseURI(), sp.storager)
 	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.storager, sp.configer.BufferSize())
 	sp.accruer, err = accruals.NewAccruals(
 		ctx,

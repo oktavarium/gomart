@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/oktavarium/gomart/internal/app/internal/authenticator/auth"
+	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer/authenticator"
 	"github.com/oktavarium/gomart/internal/app/internal/model"
 )
 
@@ -28,12 +28,12 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.authenticator.RegisterUser(r.Context(), u.Login, u.Password)
+	token, err := h.authenticatorer.RegisterUser(r.Context(), u.Login, u.Password)
 	if err != nil {
 		switch {
-		case errors.Is(err, auth.ErrEmptyCredentials):
+		case errors.Is(err, authenticator.ErrEmptyCredentials):
 			w.WriteHeader(http.StatusBadRequest)
-		case errors.Is(err, auth.ErrUserExists):
+		case errors.Is(err, authenticator.ErrUserExists):
 			w.WriteHeader(http.StatusConflict)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)

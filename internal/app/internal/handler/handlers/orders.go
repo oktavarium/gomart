@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetOrders(w http.ResponseWriter, r *http.Request) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -14,7 +14,7 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	orders, err := h.orderer.Orders(r.Context(), user)
+	orders, err := h.orderer.GetOrders(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

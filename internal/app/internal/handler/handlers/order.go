@@ -9,7 +9,7 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/orderer/orders"
 )
 
-func (h *Handlers) NewOrder(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) MakeOrder(w http.ResponseWriter, r *http.Request) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -30,7 +30,7 @@ func (h *Handlers) NewOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.Context().Value(UserLogin).(string)
-	err = h.orderer.NewOrder(r.Context(), user, string(order))
+	err = h.orderer.MakeOrder(r.Context(), user, string(order))
 	if err != nil {
 		switch {
 		case errors.Is(err, orders.ErrWrongOrderNumber):

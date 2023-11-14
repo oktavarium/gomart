@@ -7,7 +7,7 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/model"
 )
 
-func (s *storage) Balance(ctx context.Context, user string) (model.Balance, error) {
+func (s *storage) GetBalance(ctx context.Context, user string) (model.Balance, error) {
 	var balance model.Balance
 	row := s.QueryRow(ctx, `SELECT balance, withdrawn FROM users WHERE name = $1`, user)
 	if err := row.Scan(&balance.Current, &balance.Withdrawn); err != nil {
@@ -23,7 +23,7 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32)
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
 
-	userID, err := s.userID(ctx, user)
+	userID, err := s.getUserID(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
@@ -53,9 +53,9 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32)
 	return nil
 }
 
-func (s *storage) Withdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
+func (s *storage) GetWithdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
 	withdrawals := make([]model.Withdrawals, 0)
-	userID, err := s.userID(ctx, user)
+	userID, err := s.getUserID(ctx, user)
 	if err != nil {
 		return withdrawals, fmt.Errorf("error on getting user id: %w", err)
 	}

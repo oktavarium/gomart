@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handlers) Balance(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetBalance(w http.ResponseWriter, r *http.Request) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -14,7 +14,7 @@ func (h *Handlers) Balance(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	user := r.Context().Value(UserLogin).(string)
-	balance, err := h.orderer.Balance(r.Context(), user)
+	balance, err := h.orderer.GetBalance(r.Context(), user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -43,16 +43,16 @@ func NewRouter(
 			r.Use(handler.SecurityMiddleware)
 
 			r.Route("/orders", func(r chi.Router) {
-				r.Post("/", handler.NewOrder)
-				r.Get("/", handler.Orders)
+				r.Post("/", handler.MakeOrder)
+				r.Get("/", handler.GetOrders)
 			})
 
 			r.Route("/balance", func(r chi.Router) {
-				r.Get("/", handler.Balance)
+				r.Get("/", handler.GetBalance)
 				r.Post("/withdraw", handler.Withdraw)
 			})
 
-			r.Get("/withdrawals", handler.Withdrawals)
+			r.Get("/withdrawals", handler.GetWithdrawals)
 		})
 
 	})

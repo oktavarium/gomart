@@ -9,14 +9,14 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/model"
 )
 
-func (s *storage) NewOrder(ctx context.Context, user, number string) error {
+func (s *storage) MakeOrder(ctx context.Context, user, number string) error {
 	tx, err := s.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
 	defer tx.Rollback(ctx)
 
-	userID, err := s.userID(ctx, user)
+	userID, err := s.getUserID(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
@@ -40,7 +40,7 @@ func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrua
 	}
 	defer tx.Rollback(ctx)
 
-	user, err := s.UserByOrder(ctx, number)
+	user, err := s.GetUserByOrder(ctx, number)
 	if err != nil {
 		return fmt.Errorf("error on getting user by order: %w", err)
 	}
@@ -69,9 +69,9 @@ func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrua
 	return nil
 }
 
-func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error) {
+func (s *storage) GetOrders(ctx context.Context, user string) ([]model.Order, error) {
 	orders := make([]model.Order, 0)
-	userID, err := s.userID(ctx, user)
+	userID, err := s.getUserID(ctx, user)
 	if err != nil {
 		return orders, fmt.Errorf("error on getting userID: %w", err)
 	}
@@ -106,7 +106,7 @@ func (s *storage) Orders(ctx context.Context, user string) ([]model.Order, error
 	return orders, nil
 }
 
-func (s *storage) OrdersByStatus(ctx context.Context, statuses []string) ([]string, error) {
+func (s *storage) GetOrdersByStatus(ctx context.Context, statuses []string) ([]string, error) {
 	orders := make([]string, 0)
 	statusStr := strings.Join(statuses, ",")
 
@@ -132,7 +132,7 @@ func (s *storage) OrdersByStatus(ctx context.Context, statuses []string) ([]stri
 }
 
 func (s *storage) ChekUserOrder(ctx context.Context, user, order string) error {
-	userID, err := s.userID(ctx, user)
+	userID, err := s.getUserID(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting user id: %w", err)
 	}

@@ -46,7 +46,7 @@ func (s *storage) RegisterUser(ctx context.Context, user, hash, salt string) err
 	return nil
 }
 
-func (s *storage) UserHashAndSalt(ctx context.Context, user string) (string, string, error) {
+func (s *storage) GetUserHashAndSalt(ctx context.Context, user string) (string, string, error) {
 	var hash, salt string
 	row := s.QueryRow(
 		ctx,
@@ -61,7 +61,7 @@ func (s *storage) UserHashAndSalt(ctx context.Context, user string) (string, str
 	return hash, salt, nil
 }
 
-func (s *storage) UserByOrder(ctx context.Context, number string) (string, error) {
+func (s *storage) GetUserByOrder(ctx context.Context, number string) (string, error) {
 	var user string
 	row := s.QueryRow(
 		ctx,
@@ -83,7 +83,7 @@ func (s *storage) UserByOrder(ctx context.Context, number string) (string, error
 	return user, nil
 }
 
-func (s *storage) userID(ctx context.Context, user string) (string, error) {
+func (s *storage) getUserID(ctx context.Context, user string) (string, error) {
 	var userID string
 	row := s.QueryRow(ctx, `SELECT id FROM users WHERE name = $1`, user)
 

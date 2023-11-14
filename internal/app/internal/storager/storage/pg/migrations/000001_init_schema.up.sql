@@ -10,7 +10,7 @@ CREATE TABLE "users" (
 
 CREATE TABLE "orders" (
     "id" bigserial PRIMARY KEY,
-    "user_id" bigint NOT NULL,
+    "user_id" bigint NOT NULL REFERENCES users(id),
     "number" varchar NOT NULL,
     "status" varchar NOT NULL DEFAULT ('NEW'),
     "accrual" real NOT NULL DEFAULT 0,
@@ -19,11 +19,8 @@ CREATE TABLE "orders" (
 
 CREATE TABLE "withdrawals" (
     "id" bigserial PRIMARY KEY,
-    "user_id" bigint NOT NULL,
+    "user_id" bigint NOT NULL REFERENCES users(id),
     "number" varchar NOT NULL,
     "sum" real NOT NULL,
     "processed_at" timestamptz NOT NULL DEFAULT (now())
 );
-
-ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-ALTER TABLE "withdrawals" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

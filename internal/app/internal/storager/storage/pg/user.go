@@ -27,7 +27,11 @@ func (s *storage) RegisterUser(ctx context.Context, user, hash, salt string) err
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			s.logger.Error(err)
+		}
+	}()
 
 	if _, err := tx.Exec(
 		ctx,

@@ -12,5 +12,4 @@ type Orderer interface {
 	GetBalance(context.Context, string) (model.Balance, error)
 	Withdraw(context.Context, string, string, float32) error
 	GetWithdrawals(context.Context, string) ([]model.Withdrawals, error)
-	OrdersChan() <-chan string
 }

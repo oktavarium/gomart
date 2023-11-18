@@ -14,7 +14,11 @@ func (s *storage) MakeOrder(ctx context.Context, user, number string) error {
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			s.logger.Error(err)
+		}
+	}()
 
 	userID, err := s.getUserID(ctx, user)
 	if err != nil {
@@ -38,7 +42,11 @@ func (s *storage) UpdateOrder(ctx context.Context, number, status string, accrua
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			s.logger.Error(err)
+		}
+	}()
 
 	user, err := s.GetUserByOrder(ctx, number)
 	if err != nil {

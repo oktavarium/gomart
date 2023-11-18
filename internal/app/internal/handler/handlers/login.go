@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer/authenticator"
+	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer"
 	"github.com/oktavarium/gomart/internal/app/internal/model"
 )
 
@@ -31,9 +31,9 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	token, err := h.authenticatorer.Authorize(r.Context(), u.Login, u.Password)
 	if err != nil {
 		switch {
-		case errors.Is(err, authenticator.ErrEmptyCredentials):
+		case errors.Is(err, authenticatorer.ErrEmptyCredentials):
 			w.WriteHeader(http.StatusBadRequest)
-		case errors.Is(err, authenticator.ErrNotAuthorized):
+		case errors.Is(err, authenticatorer.ErrNotAuthorized):
 			w.WriteHeader(http.StatusUnauthorized)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)

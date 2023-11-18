@@ -26,7 +26,7 @@ func NewAccruals(
 	storage storager.Storager,
 	ordersCh <-chan string,
 	bufferSize uint,
-) (*Accruals, error) {
+) *Accruals {
 
 	accruals := &Accruals{
 		ctx:         ctx,
@@ -40,5 +40,5 @@ func NewAccruals(
 
 	accruals.startUpdater(pointsCh)
 
-	return accruals, nil
+	return accruals
 }

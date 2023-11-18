@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/oktavarium/gomart/internal/app/internal/logger"
+	accruals "github.com/oktavarium/gomart/internal/app/internal/orderer/orders/internal/accruer"
 	"github.com/oktavarium/gomart/internal/app/internal/storager"
 )
 
@@ -19,6 +20,7 @@ type Orders struct {
 func NewOrders(
 	ctx context.Context,
 	logger logger.Logger,
+	accrualAddress string,
 	storage storager.Storager,
 	bufferSize uint,
 ) *Orders {
@@ -34,14 +36,19 @@ func NewOrders(
 		close(ordersCh)
 	}()
 
+	accruals.NewAccruals(
+		ctx,
+		logger,
+		accrualAddress,
+		storage,
+		ordersCh,
+		bufferSize,
+	)
+
 	return &Orders{
 		ctx:      ctx,
 		logger:   logger,
 		storage:  storage,
 		ordersCh: ordersCh,
 	}
-}
-
-func (o *Orders) OrdersChan() <-chan string {
-	return o.ordersCh
 }

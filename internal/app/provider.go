@@ -1,11 +1,9 @@
-package provider
+package app
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/oktavarium/gomart/internal/app/internal/accruer"
-	"github.com/oktavarium/gomart/internal/app/internal/accruer/accruals"
 	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer"
 	"github.com/oktavarium/gomart/internal/app/internal/authenticatorer/authenticator"
 	"github.com/oktavarium/gomart/internal/app/internal/configer"
@@ -22,19 +20,18 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/storager/storage/pg"
 )
 
-type ServiceProvider struct {
-	configer      configer.Configer
-	logger        logger.Logger
-	storager      storager.Storager
-	authenticator authenticatorer.Authenticatorer
-	orderer       orderer.Orderer
-	accruer       accruer.Accruer
-	handler       handler.Handler
-	router        router.Router
+type serviceProvider struct {
+	configer        configer.Configer
+	logger          logger.Logger
+	storager        storager.Storager
+	authenticatorer authenticatorer.Authenticatorer
+	orderer         orderer.Orderer
+	handler         handler.Handler
+	router          router.Router
 }
 
-func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
-	sp := new(ServiceProvider)
+func newServiceProvider(ctx context.Context) (*serviceProvider, error) {
+	sp := new(serviceProvider)
 	var err error
 
 	sp.configer, err = config.NewConfig()
@@ -48,26 +45,14 @@ func NewServiceProvider(ctx context.Context) (*ServiceProvider, error) {
 		return nil, fmt.Errorf("error on creating storage: %w", err)
 	}
 
-	sp.authenticator = authenticator.NewAuthenticator(sp.logger, sp.configer.DatabaseURI(), sp.storager)
-	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.storager, sp.configer.BufferSize())
-	sp.accruer, err = accruals.NewAccruals(
-		ctx,
-		sp.logger,
-		sp.configer.AccrualAddress(),
-		sp.storager,
-		sp.orderer.OrdersChan(),
-		sp.configer.BufferSize(),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("error on creating accruer: %w", err)
-	}
-
-	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticator, sp.orderer)
+	sp.authenticatorer = authenticator.NewAuthenticator(sp.logger, sp.configer.DatabaseURI(), sp.storager)
+	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.configer.AccrualAddress(), sp.storager, sp.configer.BufferSize())
+	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticatorer, sp.orderer)
 	sp.router = chirouter.NewRouter(ctx, sp.logger, sp.configer.Address(), sp.handler)
 
 	return sp, nil
 }
 
-func (sp *ServiceProvider) Run() error {
+func (sp *serviceProvider) Run() error {
 	return sp.router.Run()
 }

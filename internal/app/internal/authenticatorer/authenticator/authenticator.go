@@ -29,11 +29,7 @@ func (a *Authenticator) RegisterUser(ctx context.Context, user, password string)
 		return "", authenticatorer.ErrEmptyCredentials
 	}
 
-	exists, err := a.storage.UserExists(ctx, user)
-	if err != nil {
-		return "", fmt.Errorf("error on checking user existance: %w", err)
-	}
-	if exists {
+	if a.storage.UserExists(user) {
 		return "", authenticatorer.ErrUserExists
 	}
 
@@ -59,11 +55,7 @@ func (a *Authenticator) Authorize(ctx context.Context, user, password string) (s
 		return "", authenticatorer.ErrEmptyCredentials
 	}
 
-	exists, err := a.storage.UserExists(ctx, user)
-	if err != nil {
-		return "", fmt.Errorf("error on checking user existance: %w", err)
-	}
-	if !exists {
+	if !a.storage.UserExists(user) {
 		return "", authenticatorer.ErrNotAuthorized
 	}
 

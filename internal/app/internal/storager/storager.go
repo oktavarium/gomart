@@ -16,7 +16,7 @@ type Storager interface {
 	Withdraw(context.Context, string, string, float32) error
 	UpdateBalance(context.Context, string, float32) error
 	GetWithdrawals(context.Context, string) ([]model.Withdrawals, error)
-	UserExists(context.Context, string) (bool, error)
+	UserExists(string) bool
 	RegisterUser(context.Context, string, string, string) error
 	GetUserHashAndSalt(context.Context, string) (string, string, error)
 

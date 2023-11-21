@@ -7,12 +7,12 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (s *storage) UserExists(ctx context.Context, user string) (bool, error) {
+func (s *storage) UserExists(user string) bool {
 	if _, err := s.getUserID(user); err != nil {
-		return false, err
+		return false
 	}
 
-	return true, nil
+	return true
 }
 
 func (s *storage) RegisterUser(ctx context.Context, user, hash, salt string) error {

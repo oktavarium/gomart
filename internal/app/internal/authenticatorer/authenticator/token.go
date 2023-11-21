@@ -58,12 +58,7 @@ func (a *Authenticator) GetUser(ctx context.Context, tokenString string) (string
 		return "", fmt.Errorf("token is not valid")
 	}
 
-	exists, err := a.storage.UserExists(ctx, claims.User)
-	if err != nil {
-		return "", fmt.Errorf("error on checking user existance: %w", err)
-	}
-
-	if !exists {
+	if !a.storage.UserExists(claims.User) {
 		return "", authenticatorer.ErrUserNotExists
 	}
 

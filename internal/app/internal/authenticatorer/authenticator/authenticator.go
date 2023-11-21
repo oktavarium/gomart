@@ -51,7 +51,7 @@ func (a *Authenticator) RegisterUser(ctx context.Context, user, password string)
 		return "", fmt.Errorf("error on generating token: %w", err)
 	}
 
-	return token, nil
+	return "Bearer " + token, nil
 }
 
 func (a *Authenticator) Authorize(ctx context.Context, user, password string) (string, error) {

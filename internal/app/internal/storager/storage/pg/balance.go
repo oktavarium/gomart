@@ -22,32 +22,56 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32)
 	if err != nil {
 		return fmt.Errorf("error on begin tx: %w", err)
 	}
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			s.logger.Error(err)
+		}
+	}()
 
-	userID, err := s.getUserID(ctx, user)
+	userID, err := s.getUserID(user)
 	if err != nil {
 		return fmt.Errorf("error on getting user id: %w", err)
 	}
 
 	if _, err = tx.Exec(
 		ctx,
-<<<<<<< HEAD
 		`INSERT INTO withdrawals (user_id, number, sum) VALUES ($1, $2, $3)`,
 		userID,
 		order,
-=======
-		`INSERT INTO withdrawals (user_id, order_id, sum) VALUES ($1, $2, $3)`,
-		userID,
-		orderId,
->>>>>>> ad71b6d (fix userId to userID)
 		sum,
 	); err != nil {
 		return fmt.Errorf("error on inserting values: %w", err)
 	}
 
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("error on tx commit: %w", err)
+	}
+
+	return nil
+}
+
+func (s *storage) UpdateBalance(ctx context.Context, user string, sum float32) error {
+	tx, err := s.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("error on begin tx: %w", err)
+	}
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			s.logger.Error(err)
+		}
+	}()
+
+	userID, err := s.getUserID(user)
+	if err != nil {
+		return fmt.Errorf("error on getting user id: %w", err)
+	}
+
 	if _, err = tx.Exec(
 		ctx,
-		`UPDATE users SET balance = balance - $1, withdrawn = withdrawn + $1`,
+		`UPDATE users SET balance = balance - $1, withdrawn = withdrawn + $1
+		 WHERE id = $2`,
 		sum,
+		userID,
 	); err != nil {
 		return fmt.Errorf("error on updating values: %w", err)
 	}
@@ -61,7 +85,7 @@ func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32)
 
 func (s *storage) GetWithdrawals(ctx context.Context, user string) ([]model.Withdrawals, error) {
 	withdrawals := make([]model.Withdrawals, 0)
-	userID, err := s.getUserID(ctx, user)
+	userID, err := s.getUserID(user)
 
 	if err != nil {
 		return withdrawals, fmt.Errorf("error on getting user id: %w", err)

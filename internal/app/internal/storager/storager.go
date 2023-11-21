@@ -14,8 +14,13 @@ type Storager interface {
 	GetOrdersByStatus(context.Context, []string) ([]string, error)
 	GetBalance(context.Context, string) (model.Balance, error)
 	Withdraw(context.Context, string, string, float32) error
+	UpdateBalance(context.Context, string, float32) error
 	GetWithdrawals(context.Context, string) ([]model.Withdrawals, error)
 	UserExists(context.Context, string) (bool, error)
 	RegisterUser(context.Context, string, string, string) error
 	GetUserHashAndSalt(context.Context, string) (string, string, error)
+
+	WithdrawInTx(context.Context, string, string, float32) func() error
+	UpdateBalanceInTx(context.Context, string, float32) func() error
+	MakeInTx(context.Context, ...func() error) error
 }

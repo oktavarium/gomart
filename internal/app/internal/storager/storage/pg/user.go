@@ -8,15 +8,8 @@ import (
 )
 
 func (s *storage) UserExists(ctx context.Context, user string) (bool, error) {
-	var id string
-	row := s.QueryRow(ctx, `SELECT id FROM users WHERE name = $1`, user)
-	err := row.Scan(&id)
-	if err != nil {
-		if err != pgx.ErrNoRows {
-			return false, fmt.Errorf("error on selecting values: %w", err)
-		} else {
-			return false, nil
-		}
+	if _, err := s.getUserID(user); err != nil {
+		return false, err
 	}
 
 	return true, nil
@@ -33,19 +26,22 @@ func (s *storage) RegisterUser(ctx context.Context, user, hash, salt string) err
 		}
 	}()
 
-	if _, err := tx.Exec(
+	var id string
+	if err := tx.QueryRow(
 		ctx,
-		`INSERT INTO users (name, hash, salt) VALUES ($1, $2, $3)`,
+		`INSERT INTO users (name, hash, salt) VALUES ($1, $2, $3) RETURNING id`,
 		user,
 		hash,
 		salt,
-	); err != nil {
+	).Scan(&id); err != nil {
 		return fmt.Errorf("error on making insert: %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("error on tx commit: %w", err)
 	}
+
+	s.users[user] = id
 
 	return nil
 }
@@ -87,13 +83,34 @@ func (s *storage) GetUserByOrder(ctx context.Context, number string) (string, er
 	return user, nil
 }
 
-func (s *storage) getUserID(ctx context.Context, user string) (string, error) {
-	var userID string
-	row := s.QueryRow(ctx, `SELECT id FROM users WHERE name = $1`, user)
-
-	if err := row.Scan(&userID); err != nil {
-		return userID, fmt.Errorf("error on scanning values: %w", err)
+func (s *storage) getUserID(user string) (string, error) {
+	if userID, ok := s.users[user]; ok {
+		return userID, nil
 	}
 
-	return userID, nil
+	return "", fmt.Errorf("no such user")
+}
+
+func (s *storage) cacheUsers(ctx context.Context) error {
+	rows, err := s.Query(ctx, `SELECT id, name FROM users`)
+	if err != nil {
+		return fmt.Errorf("error on selecting users: %w", err)
+	}
+
+	defer rows.Close()
+
+	var name, id string
+	for rows.Next() {
+		if err := rows.Scan(&id, &name); err != nil {
+			return fmt.Errorf("error on scanning values: %w", err)
+		}
+
+		s.users[name] = id
+	}
+
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("error on selecting values: %w", err)
+	}
+
+	return nil
 }

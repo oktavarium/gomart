@@ -11,6 +11,7 @@ import (
 type storage struct {
 	*pgxpool.Pool
 	logger logger.Logger
+	users  map[string]string
 }
 
 func NewStorage(ctx context.Context, logger logger.Logger, dbURI string) (*storage, error) {
@@ -26,6 +27,11 @@ func NewStorage(ctx context.Context, logger logger.Logger, dbURI string) (*stora
 	s := &storage{
 		Pool:   pool,
 		logger: logger,
+		users:  make(map[string]string),
+	}
+
+	if err := s.cacheUsers(ctx); err != nil {
+		return nil, fmt.Errorf("error on caching users: %w", err)
 	}
 
 	return s, nil

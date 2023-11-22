@@ -5,34 +5,34 @@ import (
 	"time"
 
 	"github.com/oktavarium/gomart/internal/app/internal/logger"
+	"github.com/oktavarium/gomart/internal/app/internal/pointstorer"
 	"github.com/oktavarium/gomart/internal/app/internal/storager"
 )
 
-var accrualPath = "api/orders"
 var defaultBufferize uint = 10
 var defaultRequestInterval = 1 * time.Second
 
 type Accruals struct {
-	ctx         context.Context
-	logger      logger.Logger
-	accrualAddr string
-	storage     storager.Storager
+	ctx     context.Context
+	logger  logger.Logger
+	ps      pointstorer.PointStorer
+	storage storager.Storager
 }
 
 func NewAccruals(
 	ctx context.Context,
 	logger logger.Logger,
-	accrualAddr string,
+	ps pointstorer.PointStorer,
 	storage storager.Storager,
 	ordersCh <-chan string,
 	bufferSize uint,
 ) *Accruals {
 
 	accruals := &Accruals{
-		ctx:         ctx,
-		logger:      logger,
-		accrualAddr: accrualAddr,
-		storage:     storage,
+		ctx:     ctx,
+		logger:  logger,
+		ps:      ps,
+		storage: storage,
 	}
 
 	unproccessedOrdersCh := accruals.startLoader(ctx, bufferSize)

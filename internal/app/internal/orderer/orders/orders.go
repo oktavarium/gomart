@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/oktavarium/gomart/internal/app/internal/logger"
-	accruals "github.com/oktavarium/gomart/internal/app/internal/orderer/orders/internal/accruer"
+	"github.com/oktavarium/gomart/internal/app/internal/orderer/orders/internal/accruals"
+	"github.com/oktavarium/gomart/internal/app/internal/pointstorer"
 	"github.com/oktavarium/gomart/internal/app/internal/storager"
 )
 
@@ -20,7 +21,7 @@ type Orders struct {
 func NewOrders(
 	ctx context.Context,
 	logger logger.Logger,
-	accrualAddress string,
+	ps pointstorer.PointStorer,
 	storage storager.Storager,
 	bufferSize uint,
 ) *Orders {
@@ -39,7 +40,7 @@ func NewOrders(
 	accruals.NewAccruals(
 		ctx,
 		logger,
-		accrualAddress,
+		ps,
 		storage,
 		ordersCh,
 		bufferSize,

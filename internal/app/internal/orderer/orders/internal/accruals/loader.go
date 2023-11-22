@@ -22,12 +22,12 @@ func (a *Accruals) startLoader(ctx context.Context, bufferSize uint) <-chan stri
 		defer ticker.Stop()
 		for range ticker.C {
 			select {
-			case <-ctx.Done():
+			case <-a.ctx.Done():
 				close(outCh)
 				return
 			default:
 				a.logger.Info("LOADING PROCESSING MESSAGES")
-				unproccessedOrders, err := a.storage.GetOrdersByStatus(ctx, []string{PROCESSING})
+				unproccessedOrders, err := a.storage.GetOrdersByStatus(a.ctx, []string{PROCESSING})
 				if err != nil {
 					a.logger.Error(fmt.Errorf("error on getting orders by status: %w", err))
 					continue

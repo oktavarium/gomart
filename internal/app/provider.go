@@ -14,6 +14,8 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/logger/log"
 	"github.com/oktavarium/gomart/internal/app/internal/orderer"
 	"github.com/oktavarium/gomart/internal/app/internal/orderer/orders"
+	"github.com/oktavarium/gomart/internal/app/internal/pointstorer"
+	"github.com/oktavarium/gomart/internal/app/internal/pointstorer/pointstore"
 	"github.com/oktavarium/gomart/internal/app/internal/router"
 	"github.com/oktavarium/gomart/internal/app/internal/router/chirouter"
 	"github.com/oktavarium/gomart/internal/app/internal/storager"
@@ -26,6 +28,7 @@ type serviceProvider struct {
 	storager        storager.Storager
 	authenticatorer authenticatorer.Authenticatorer
 	orderer         orderer.Orderer
+	pointstore      pointstorer.PointStorer
 	handler         handler.Handler
 	router          router.Router
 }
@@ -46,7 +49,8 @@ func newServiceProvider(ctx context.Context) (*serviceProvider, error) {
 	}
 
 	sp.authenticatorer = authenticator.NewAuthenticator(sp.logger, sp.configer.DatabaseURI(), sp.storager)
-	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.configer.AccrualAddress(), sp.storager, sp.configer.BufferSize())
+	sp.pointstore = pointstore.NewPointStore(sp.logger, sp.configer.AccrualAddress())
+	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.pointstore, sp.storager, sp.configer.BufferSize())
 	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticatorer, sp.orderer)
 	sp.router = chirouter.NewRouter(ctx, sp.logger, sp.configer.Address(), sp.handler)
 

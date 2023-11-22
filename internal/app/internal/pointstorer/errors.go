@@ -1,4 +1,4 @@
-package accruals
+package pointstorer
 
 import "errors"
 

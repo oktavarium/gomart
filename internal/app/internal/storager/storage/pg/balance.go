@@ -7,14 +7,14 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/model"
 )
 
-func (s *storage) GetBalance(ctx context.Context, user string) (model.Balance, error) {
-	var balance model.Balance
+func (s *storage) GetBalance(ctx context.Context, user string) (float32, float32, error) {
+	var current, withdrawn float32
 	row := s.QueryRow(ctx, `SELECT balance, withdrawn FROM users WHERE name = $1`, user)
-	if err := row.Scan(&balance.Current, &balance.Withdrawn); err != nil {
-		return balance, fmt.Errorf("error on selecting values: %w", err)
+	if err := row.Scan(&current, &withdrawn); err != nil {
+		return current, withdrawn, fmt.Errorf("error on selecting values: %w", err)
 	}
 
-	return model.Balance(balance), nil
+	return current, withdrawn, nil
 }
 
 func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32) error {

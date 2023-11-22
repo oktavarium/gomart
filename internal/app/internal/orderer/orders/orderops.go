@@ -45,13 +45,13 @@ func (o *Orders) GetOrders(ctx context.Context, user string) ([]model.Order, err
 	return orders, nil
 }
 
-func (o *Orders) GetBalance(ctx context.Context, user string) (model.Balance, error) {
-	balance, err := o.storage.GetBalance(ctx, user)
+func (o *Orders) GetBalance(ctx context.Context, user string) (float32, float32, error) {
+	current, withdrawn, err := o.storage.GetBalance(ctx, user)
 	if err != nil {
-		return balance, fmt.Errorf("error on getting balance: %w", err)
+		return current, withdrawn, fmt.Errorf("error on getting balance: %w", err)
 	}
 
-	return balance, nil
+	return current, withdrawn, nil
 }
 
 func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) error {
@@ -60,12 +60,12 @@ func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) 
 		return ErrWrongOrderNumber
 	}
 
-	balance, err := o.storage.GetBalance(ctx, user)
+	current, _, err := o.storage.GetBalance(ctx, user)
 	if err != nil {
 		return fmt.Errorf("error on getting balance: %w", err)
 	}
 
-	if balance.Current < sum {
+	if current < sum {
 		return ErrNotEnoughBalance
 	}
 

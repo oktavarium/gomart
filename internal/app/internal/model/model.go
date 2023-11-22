@@ -2,11 +2,6 @@ package model
 
 import "time"
 
-type User struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
-
 type Order struct {
 	Order      string    `json:"number"`
 	Status     string    `json:"status"`
@@ -23,11 +18,6 @@ type Withdrawals struct {
 type Withdrawal struct {
 	Order string  `json:"order"`
 	Sum   float32 `json:"sum"`
-}
-
-type Balance struct {
-	Current   float32 `json:"current"`
-	Withdrawn float32 `json:"withdrawn"`
 }
 
 type Points struct {

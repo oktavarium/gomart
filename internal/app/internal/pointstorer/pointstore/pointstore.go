@@ -37,11 +37,23 @@ func (ps *PointStore) GetPoints(ctx context.Context, order string) (model.Points
 
 	switch resp.StatusCode() {
 	case http.StatusNoContent:
-		return points, pointstorer.ErrNotRegistered
+		return points, fmt.Errorf(
+			"%w, response body: %s",
+			pointstorer.ErrNotRegistered,
+			string(resp.Body()),
+		)
 	case http.StatusTooManyRequests:
-		return points, pointstorer.ErrTooManyRequests
+		return points, fmt.Errorf(
+			"%w, response body: %s",
+			pointstorer.ErrTooManyRequests,
+			string(resp.Body()),
+		)
 	case http.StatusInternalServerError:
-		return points, pointstorer.ErrAccrualSystemError
+		return points, fmt.Errorf(
+			"%w, response body: %s",
+			pointstorer.ErrAccrualSystemError,
+			string(resp.Body()),
+		)
 	}
 
 	return points, nil

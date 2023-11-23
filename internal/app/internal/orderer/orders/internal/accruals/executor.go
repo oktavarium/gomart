@@ -15,11 +15,11 @@ func (a *Accruals) startExecutor(orders <-chan string, bufferSize uint) <-chan m
 
 	go func() {
 		ticker := time.NewTicker(defaultRequestInterval)
+		defer close(outCh)
 		defer ticker.Stop()
 		for range ticker.C {
 			select {
 			case <-a.ctx.Done():
-				close(outCh)
 				return
 			default:
 				if order, ok := <-orders; ok {

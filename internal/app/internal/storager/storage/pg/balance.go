@@ -17,6 +17,32 @@ func (s *storage) GetBalance(ctx context.Context, user string) (float32, float32
 	return current, withdrawn, nil
 }
 
+func (s *storage) WithdrawAndUpdate(ctx context.Context, user, order string, sum float32) error {
+	tx, err := s.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("error on begin tx: %w", err)
+	}
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			s.logger.Error(err)
+		}
+	}()
+
+	if err := s.Withdraw(ctx, user, order, sum); err != nil {
+		return fmt.Errorf("error on withdraw: %w", err)
+	}
+
+	if err := s.UpdateBalance(ctx, user, sum); err != nil {
+		return fmt.Errorf("error on updating balance: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("error on tx commit: %w", err)
+	}
+
+	return nil
+}
+
 func (s *storage) Withdraw(ctx context.Context, user, order string, sum float32) error {
 	tx, err := s.Begin(ctx)
 	if err != nil {

@@ -69,11 +69,7 @@ func (o *Orders) Withdraw(ctx context.Context, user, order string, sum float32) 
 		return ErrNotEnoughBalance
 	}
 
-	if err := o.storage.MakeInTx(
-		ctx,
-		o.storage.WithdrawInTx(ctx, user, order, sum),
-		o.storage.UpdateBalanceInTx(ctx, user, sum),
-	); err != nil {
+	if err := o.storage.WithdrawAndUpdate(ctx, user, order, sum); err != nil {
 		return fmt.Errorf("error on withdrawal: %w", err)
 	}
 

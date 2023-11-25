@@ -2,9 +2,11 @@ package orders
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/oktavarium/gomart/internal/app/internal/model"
+	"github.com/oktavarium/gomart/internal/app/internal/pointstorer"
 )
 
 func (o *Orders) MakeOrder(ctx context.Context, user, order string) error {
@@ -24,6 +26,12 @@ func (o *Orders) MakeOrder(ctx context.Context, user, order string) error {
 
 	if len(dbUser) != 0 {
 		return ErrAnotherUserOrder
+	}
+
+	if _, err := o.ps.GetPoints(ctx, order); err != nil {
+		if errors.Is(err, pointstorer.ErrNotRegistered) {
+			return fmt.Errorf("invalid order number: %w", ErrWrongOrderNumber)
+		}
 	}
 
 	err = o.storage.MakeOrder(ctx, user, order)

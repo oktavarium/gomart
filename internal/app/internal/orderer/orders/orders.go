@@ -14,6 +14,7 @@ var defaultBufferize uint = 10
 type Orders struct {
 	ctx      context.Context
 	logger   logger.Logger
+	ps       pointstorer.PointStorer
 	storage  storager.Storager
 	ordersCh chan string
 }
@@ -49,6 +50,7 @@ func NewOrders(
 	return &Orders{
 		ctx:      ctx,
 		logger:   logger,
+		ps:       ps,
 		storage:  storage,
 		ordersCh: ordersCh,
 	}

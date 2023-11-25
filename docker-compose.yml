@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13.3
+    extends:
+      file: deployments/base.yml
+      service: base
+    ports:
+      - "5432:5432"
+    healthcheck:
+        test: ["CMD", "psql", $DATABASE_URI]
+        interval: 3s
+        timeout: 1s
+        retries: 5
+  gophermart:
+    image: market
+    ports:
+      - "8080:8080"
+      - "8888:8888"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: deployments/gophermart.dockerfile
+    extends:
+      file: deployments/base.yml
+      service: base
+

@@ -30,8 +30,7 @@ func (o *Orders) MakeOrder(ctx context.Context, user, order string) error {
 
 	if _, err := o.ps.GetPoints(ctx, order); err != nil {
 		if errors.Is(err, pointstorer.ErrNotRegistered) {
-			fmt.Println(err)
-			return fmt.Errorf("invalid order number: %w", ErrWrongOrderNumber)
+			o.logger.Debug(err.Error())
 		}
 	}
 

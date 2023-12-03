@@ -7,4 +7,5 @@ type Configer interface {
 	LogLevel() string
 	SecretKey() string
 	BufferSize() uint
+	TestMode() bool
 }

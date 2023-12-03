@@ -15,6 +15,7 @@ type config struct {
 	CLogLevel       string `env:"LOG_LEVEL"`                        // уровень логирования сервиса
 	CSecretKey      string `env:"SECRET_KEY" envDefault:"test_key"` // ключ для подписывания токена
 	CBufferSize     uint   `env:"BUFFER_SIZE" envDefault:"100"`     // размер буфферов для обработки
+	CTestMode       bool   `env:"TEST_MODE" envDefault:"false"`     // режим тестов
 }
 
 func (c *config) Address() string {
@@ -41,6 +42,10 @@ func (c *config) BufferSize() uint {
 	return c.CBufferSize
 }
 
+func (c *config) TestMode() bool {
+	return c.CTestMode
+}
+
 func NewConfig() (*config, error) {
 	var c config
 
@@ -49,6 +54,7 @@ func NewConfig() (*config, error) {
 	flag.StringVar(&c.CAccrualAddress, "r", "", "accrual system address")
 	flag.StringVar(&c.CLogLevel, "l", "debug", "logger debug level")
 	flag.UintVar(&c.CBufferSize, "b", 100, "default buffer size")
+	flag.BoolVar(&c.CTestMode, "t", false, "test mode")
 
 	flag.Parse()
 

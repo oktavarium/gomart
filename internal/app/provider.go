@@ -15,6 +15,7 @@ import (
 	"github.com/oktavarium/gomart/internal/app/internal/orderer"
 	"github.com/oktavarium/gomart/internal/app/internal/orderer/orders"
 	"github.com/oktavarium/gomart/internal/app/internal/pointstorer"
+	"github.com/oktavarium/gomart/internal/app/internal/pointstorer/pointmock"
 	"github.com/oktavarium/gomart/internal/app/internal/pointstorer/pointstore"
 	"github.com/oktavarium/gomart/internal/app/internal/router"
 	"github.com/oktavarium/gomart/internal/app/internal/router/chirouter"
@@ -49,7 +50,13 @@ func newServiceProvider(ctx context.Context) (*serviceProvider, error) {
 	}
 
 	sp.authenticatorer = authenticator.NewAuthenticator(sp.logger, sp.configer.DatabaseURI(), sp.storager)
-	sp.pointstore = pointstore.NewPointStore(sp.logger, sp.configer.AccrualAddress())
+
+	if sp.configer.TestMode() {
+		sp.pointstore = pointmock.NewPointmock(sp.logger)
+	} else {
+		sp.pointstore = pointstore.NewPointStore(sp.logger, sp.configer.AccrualAddress())
+	}
+
 	sp.orderer = orders.NewOrders(ctx, sp.logger, sp.pointstore, sp.storager, sp.configer.BufferSize())
 	sp.handler = handlers.NewHandlers(sp.logger, sp.authenticatorer, sp.orderer)
 	sp.router = chirouter.NewRouter(ctx, sp.logger, sp.configer.Address(), sp.handler)

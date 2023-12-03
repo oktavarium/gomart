@@ -1,8 +1,9 @@
 FROM golang:1.21 as build
 WORKDIR /src
-COPY cmd/gophermart/main.go cmd/gophermart/main.go
-COPY internal internal
-COPY go.* .
+COPY cmd/gophermart/main.go cmd/gophermart/
+COPY internal internal/
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o gophermart cmd/gophermart/main.go
 

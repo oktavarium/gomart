@@ -12,4 +12,5 @@ type Handler interface {
 	GetBalance(http.ResponseWriter, *http.Request)
 	Withdraw(http.ResponseWriter, *http.Request)
 	GetWithdrawals(http.ResponseWriter, *http.Request)
+	Ping(http.ResponseWriter, *http.Request)
 }

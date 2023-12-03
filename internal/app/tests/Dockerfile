@@ -1,13 +1,8 @@
-FROM golang:1.21 as build
+FROM golang:1.21
 WORKDIR /src
-COPY cmd/client/main.go .
-COPY internal .
-COPY go.* .
+COPY cmd/gophermart/main.go cmd/gophermart/
+COPY internal internal/
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o client cmd/client/main.go
-
-FROM scratch as run
-EXPOSE 8080
-COPY --from=build /src/client .
-ENTRYPOINT ["/client"]
-
+ENTRYPOINT go test github.com/oktavarium/gomart/internal/app/tests -count=1 -v

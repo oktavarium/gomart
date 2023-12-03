@@ -16,13 +16,22 @@ services:
     image: market
     ports:
       - "8080:8080"
-      - "8888:8888"
     depends_on:
       postgres:
         condition: service_healthy
     build:
       context: .
       dockerfile: cmd/gophermart/Dockerfile
+    env_file: .env
+  client:
+    container_name: client
+    image: client
+    depends_on:
+      gophermart:
+        condition: service_started
+    build:
+      context: .
+      dockerfile: internal/app/tests/Dockerfile
     env_file: .env
 
 

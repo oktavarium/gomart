@@ -2,6 +2,7 @@ package chirouter
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -32,6 +33,8 @@ func NewRouter(
 		addr:   addr,
 		logger: logger,
 	}
+
+	server.Get("/ping", handler.Ping)
 
 	server.Route(apiPath, func(r chi.Router) {
 		r.Use(handler.LoggerMiddleware)
@@ -66,7 +69,9 @@ func (s *ChiRouter) Run() error {
 		<-s.ctx.Done()
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		server.Shutdown(ctx)
+		if err := server.Shutdown(ctx); err != nil {
+			s.logger.Error(fmt.Errorf("error on server shutdown: %w", err))
+		}
 	}()
 
 	return server.ListenAndServe()

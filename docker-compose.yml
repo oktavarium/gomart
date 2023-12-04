@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: marketdb
+    image: postgres:13.3
+    ports:
+      - "5432:5432"
+    healthcheck:
+        test: ["CMD", "psql", $DATABASE_URI]
+        interval: 3s
+        timeout: 1s
+        retries: 5
+    env_file: .env
+  gophermart:
+    container_name: gophermart
+    image: market
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: cmd/gophermart/Dockerfile
+    environment:
+      - TEST_MODE=$TEST_MODE
+    env_file: .env
+  client:
+    container_name: client
+    image: client
+    depends_on:
+      gophermart:
+        condition: service_started
+    build:
+      context: .
+      dockerfile: internal/app/tests/Dockerfile
+    environment:
+      - TEST_MODE=$TEST_MODE
+    env_file: .env
+
+

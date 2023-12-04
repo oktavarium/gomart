@@ -11,52 +11,95 @@ import (
 
 func testWithdraw(t *testing.T) {
 	testName := "login user for witdraw"
-	_, code, token, err := post(
+	_, code, token := post(
 		context.Background(),
 		"login",
 		"application/json",
 		"",
-		user{
-			Login:    "andrew",
-			Password: "userpass",
-		},
+		userAndrew,
 		t,
 	)
 
-	require.Equal(t, nil, err, testName)
 	require.Equal(t, http.StatusOK, code, testName)
 	require.Equal(t, len(token) != 0, true, testName)
 
-	testName = "withdraw"
-	_, code, _, err = post(
-		context.Background(),
-		"balance/withdraw",
-		"application/json",
-		token,
-		withdrawal{
-			Order: "12345678903",
-			Sum:   10.0,
+	table := []struct {
+		name     string
+		method   string
+		ct       string
+		order    string
+		token    string
+		body     any
+		codeWant int
+	}{
+		{
+			name:   "good withdraw",
+			method: "balance/withdraw",
+			ct:     "application/json",
+			order:  goodOrderNum,
+			token:  token,
+			body: withdrawal{
+				Order: goodOrderNum,
+				Sum:   10.0,
+			},
+			codeWant: http.StatusOK,
 		},
-		t,
-	)
+		{
+			name:   "withdraw unauthorized",
+			method: "balance/withdraw",
+			ct:     "application/json",
+			order:  goodOrderNum,
+			token:  "",
+			body: withdrawal{
+				Order: goodOrderNum,
+				Sum:   1.0,
+			},
+			codeWant: http.StatusUnauthorized,
+		},
+		{
+			name:   "withdraw too much",
+			method: "balance/withdraw",
+			ct:     "application/json",
+			order:  goodOrderNum,
+			token:  token,
+			body: withdrawal{
+				Order: goodOrderNum,
+				Sum:   1000000.0,
+			},
+			codeWant: http.StatusPaymentRequired,
+		},
+		{
+			name:   "withdraw bad order",
+			method: "balance/withdraw",
+			ct:     "application/json",
+			order:  badOrderNum,
+			token:  token,
+			body: withdrawal{
+				Order: goodOrderNum,
+				Sum:   1.0,
+			},
+			codeWant: http.StatusUnprocessableEntity,
+		},
+	}
 
-	require.Equal(t, nil, err, testName)
-	require.Equal(t, http.StatusOK, code, testName)
+	for _, test := range table {
+		_, code, _ := post(
+			context.Background(),
+			test.method,
+			test.ct,
+			test.token,
+			test.body,
+			t,
+		)
 
-	require.NoError(t, err, testName)
+		require.Equal(t, test.codeWant, code, test.name)
+	}
 
-	resp, code, err := get(
-		context.Background(),
-		"withdrawals",
-		token,
-		t,
-	)
-
-	require.Equal(t, nil, err, testName)
+	resp, code := get(context.Background(), "withdrawals", token, t)
 	require.Equal(t, http.StatusOK, code, testName)
 
 	var w withdrawals
-	err = json.Unmarshal(resp, &w)
+	err := json.Unmarshal(resp, &w)
 	require.NoError(t, err, testName)
 	require.NotEmpty(t, w, testName)
 }

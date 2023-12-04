@@ -11,35 +11,30 @@ import (
 
 func testBalance(t *testing.T) {
 	testName := "login user for get balance"
-	_, code, token, err := post(
+	_, code, token := post(
 		context.Background(),
 		"login",
 		"application/json",
 		"",
-		user{
-			Login:    "andrew",
-			Password: "userpass",
-		},
+		userAndrew,
 		t,
 	)
 
-	require.Equal(t, nil, err, testName)
 	require.Equal(t, http.StatusOK, code, testName)
 	require.Equal(t, len(token) != 0, true, testName)
 
 	testName = "get balance"
-	resp, code, err := get(
+	resp, code := get(
 		context.Background(),
 		"balance",
 		token,
 		t,
 	)
 
-	require.Equal(t, nil, err, testName)
 	require.Equal(t, http.StatusOK, code, testName)
 
 	var b balance
-	err = json.Unmarshal(resp, &b)
+	err := json.Unmarshal(resp, &b)
 	require.NoError(t, err, testName)
 	require.NotEmpty(t, b.Current, testName)
 	require.Empty(t, b.Withdrawn, testName)

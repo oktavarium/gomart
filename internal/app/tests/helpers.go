@@ -7,9 +7,24 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/stretchr/testify/require"
 )
 
 var endpoint string = "http://gophermart:8080/api/user"
+
+var userAndrew = user{
+	Login:    "andrew",
+	Password: "userpass",
+}
+
+var userJimmy = user{
+	Login:    "jimmy",
+	Password: "userpass",
+}
+
+var goodOrderNum string = "12345678903"
+var badOrderNum string = "12345678904"
+var orderStatus string = "PROCESSED"
 
 type user struct {
 	Login    string `json:"login"`
@@ -41,37 +56,28 @@ type withdrawals struct {
 
 func post(
 	ctx context.Context,
-	method string,
+	m string,
 	ct string,
 	token string,
-	body any,
+	b any,
 	t *testing.T,
-) (any, int, string, error) {
-
+) (any, int, string) {
 	t.Helper()
 
 	var result interface{}
 	c := resty.New()
-	request := c.R().SetContext(ctx).SetBody(body).SetResult(&result).SetHeader("Content-Type", ct)
+	request := c.R().SetContext(ctx).SetBody(b).SetResult(&result).SetHeader("Content-Type", ct)
 	if len(token) != 0 {
 		request.SetHeader("Authorization", token)
 	}
 
-	resp, err := request.Post(fmt.Sprintf("%s/%s", endpoint, method))
-	if err != nil {
-		return result, 0, "", fmt.Errorf("error on making post request: %w", err)
-	}
+	resp, err := request.Post(fmt.Sprintf("%s/%s", endpoint, m))
+	require.NoError(t, err, "making get request")
 
-	return result, resp.StatusCode(), resp.Header().Get("Authorization"), nil
+	return result, resp.StatusCode(), resp.Header().Get("Authorization")
 }
 
-func get(
-	ctx context.Context,
-	method string,
-	token string,
-	t *testing.T,
-) ([]byte, int, error) {
-
+func get(ctx context.Context, m string, token string, t *testing.T) ([]byte, int) {
 	t.Helper()
 
 	c := resty.New()
@@ -80,10 +86,8 @@ func get(
 		request.SetHeader("Authorization", token)
 	}
 
-	resp, err := request.Get(fmt.Sprintf("%s/%s", endpoint, method))
-	if err != nil {
-		return nil, 0, fmt.Errorf("error on making get request: %w", err)
-	}
+	resp, err := request.Get(fmt.Sprintf("%s/%s", endpoint, m))
+	require.NoError(t, err, "making get request")
 
-	return resp.Body(), resp.StatusCode(), nil
+	return resp.Body(), resp.StatusCode()
 }

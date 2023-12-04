@@ -14,7 +14,6 @@ func testUser(t *testing.T) {
 		method    string
 		ct        string
 		body      any
-		errWant   error
 		codeWant  int
 		tokenWant bool
 	}{
@@ -23,62 +22,61 @@ func testUser(t *testing.T) {
 			method:    "login",
 			ct:        "application/json",
 			body:      nil,
-			errWant:   nil,
 			codeWant:  http.StatusBadRequest,
 			tokenWant: false,
 		},
 		{
-			name:   "login invalid user",
-			method: "login",
-			ct:     "application/json",
-			body: user{
-				Login:    "user",
-				Password: "userpass",
-			},
-			errWant:   nil,
+			name:      "login invalid user",
+			method:    "login",
+			ct:        "application/json",
+			body:      userAndrew,
 			codeWant:  http.StatusUnauthorized,
 			tokenWant: false,
 		},
 		{
-			name:   "register user",
-			method: "register",
-			ct:     "application/json",
-			body: user{
-				Login:    "user",
-				Password: "userpass",
-			},
-			errWant:   nil,
+			name:      "register user",
+			method:    "register",
+			ct:        "application/json",
+			body:      userAndrew,
 			codeWant:  http.StatusOK,
 			tokenWant: true,
 		},
 		{
-			name:   "login valid user",
-			method: "login",
-			ct:     "application/json",
-			body: user{
-				Login:    "user",
-				Password: "userpass",
-			},
-			errWant:   nil,
+			name:      "login valid user",
+			method:    "login",
+			ct:        "application/json",
+			body:      userAndrew,
 			codeWant:  http.StatusOK,
 			tokenWant: true,
 		},
 		{
-			name:   "register exists user",
-			method: "register",
-			ct:     "application/json",
-			body: user{
-				Login:    "user",
-				Password: "userpass",
-			},
-			errWant:   nil,
+			name:      "login valid user",
+			method:    "login",
+			ct:        "application/json",
+			body:      userJimmy,
+			codeWant:  http.StatusOK,
+			tokenWant: true,
+		},
+		{
+			name:      "register exists user",
+			method:    "register",
+			ct:        "application/json",
+			body:      userAndrew,
 			codeWant:  http.StatusConflict,
+			tokenWant: false,
+		},
+		{
+			name:      "register bad request",
+			method:    "register",
+			ct:        "",
+			body:      nil,
+			codeWant:  http.StatusBadRequest,
 			tokenWant: false,
 		},
 	}
 
 	for _, test := range table {
-		_, code, token, err := post(
+		_, code, token := post(
 			context.Background(),
 			test.method,
 			test.ct,
@@ -86,7 +84,6 @@ func testUser(t *testing.T) {
 			test.body,
 			t,
 		)
-		require.Equal(t, test.errWant, err, test.name)
 		require.Equal(t, test.codeWant, code, test.name)
 		require.Equal(t, test.tokenWant, len(token) != 0, test.name)
 	}

@@ -15,4 +15,5 @@ func TestMain(t *testing.T) {
 	testGetOrders(t)
 	testBalance(t)
 	testWithdraw(t)
+	testWithdrawals(t)
 }

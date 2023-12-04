@@ -9,22 +9,30 @@ import (
 )
 
 func testCreateOrders(t *testing.T) {
-	testName := "register user for orders"
-	_, code, token, err := post(
+	testName := "login user for orders"
+	_, code, tokenAndrew := post(
 		context.Background(),
-		"register",
+		"login",
 		"application/json",
 		"",
-		user{
-			Login:    "andrew",
-			Password: "userpass",
-		},
+		userAndrew,
 		t,
 	)
 
-	require.Equal(t, nil, err, testName)
 	require.Equal(t, http.StatusOK, code, testName)
-	require.Equal(t, len(token) != 0, true, testName)
+	require.Equal(t, len(tokenAndrew) != 0, true, testName)
+
+	_, code, tokenJimmy := post(
+		context.Background(),
+		"login",
+		"application/json",
+		"",
+		userJimmy,
+		t,
+	)
+
+	require.Equal(t, http.StatusOK, code, testName)
+	require.Equal(t, len(tokenJimmy) != 0, true, testName)
 
 	table := []struct {
 		name     string
@@ -32,7 +40,6 @@ func testCreateOrders(t *testing.T) {
 		ct       string
 		order    string
 		token    string
-		errWant  error
 		codeWant int
 		respWant any
 	}{
@@ -40,45 +47,54 @@ func testCreateOrders(t *testing.T) {
 			name:     "create wrong order",
 			method:   "orders",
 			ct:       "text/plain",
-			order:    "12345678904",
-			token:    token,
-			errWant:  nil,
+			order:    badOrderNum,
+			token:    tokenAndrew,
 			codeWant: http.StatusUnprocessableEntity,
-			respWant: nil,
+		},
+		{
+			name:     "create order bad request",
+			method:   "orders",
+			ct:       "",
+			order:    badOrderNum,
+			token:    tokenAndrew,
+			codeWant: http.StatusBadRequest,
 		},
 		{
 			name:     "create good order unauthorized",
 			method:   "orders",
 			ct:       "text/plain",
-			order:    "12345678903",
+			order:    goodOrderNum,
 			token:    "",
-			errWant:  nil,
 			codeWant: http.StatusUnauthorized,
-			respWant: nil,
 		},
 		{
 			name:     "create good order",
 			method:   "orders",
 			ct:       "text/plain",
-			order:    "12345678903",
-			token:    token,
-			errWant:  nil,
+			order:    goodOrderNum,
+			token:    tokenAndrew,
 			codeWant: http.StatusAccepted,
-			respWant: nil,
+		},
+		{
+			name:     "create good order with same number",
+			method:   "orders",
+			ct:       "text/plain",
+			order:    goodOrderNum,
+			token:    tokenAndrew,
+			codeWant: http.StatusOK,
+		},
+		{
+			name:     "create good order with same number from another user",
+			method:   "orders",
+			ct:       "text/plain",
+			order:    goodOrderNum,
+			token:    tokenJimmy,
+			codeWant: http.StatusConflict,
 		},
 	}
 
 	for _, test := range table {
-		resp, code, _, err := post(
-			context.Background(),
-			test.method,
-			test.ct,
-			test.token,
-			test.order,
-			t,
-		)
-		require.Equal(t, test.errWant, err, test.name)
+		_, code, _ := post(context.Background(), test.method, test.ct, test.token, test.order, t)
 		require.Equal(t, test.codeWant, code, test.name)
-		require.Equal(t, test.respWant, resp, test.name)
 	}
 }

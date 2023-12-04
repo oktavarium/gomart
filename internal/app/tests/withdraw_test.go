@@ -2,7 +2,6 @@ package tests
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -27,7 +26,6 @@ func testWithdraw(t *testing.T) {
 		name     string
 		method   string
 		ct       string
-		order    string
 		token    string
 		body     any
 		codeWant int
@@ -36,7 +34,6 @@ func testWithdraw(t *testing.T) {
 			name:   "good withdraw",
 			method: "balance/withdraw",
 			ct:     "application/json",
-			order:  goodOrderNum,
 			token:  token,
 			body: withdrawal{
 				Order: goodOrderNum,
@@ -48,7 +45,6 @@ func testWithdraw(t *testing.T) {
 			name:   "withdraw unauthorized",
 			method: "balance/withdraw",
 			ct:     "application/json",
-			order:  goodOrderNum,
 			token:  "",
 			body: withdrawal{
 				Order: goodOrderNum,
@@ -60,7 +56,6 @@ func testWithdraw(t *testing.T) {
 			name:   "withdraw too much",
 			method: "balance/withdraw",
 			ct:     "application/json",
-			order:  goodOrderNum,
 			token:  token,
 			body: withdrawal{
 				Order: goodOrderNum,
@@ -72,10 +67,9 @@ func testWithdraw(t *testing.T) {
 			name:   "withdraw bad order",
 			method: "balance/withdraw",
 			ct:     "application/json",
-			order:  badOrderNum,
 			token:  token,
 			body: withdrawal{
-				Order: goodOrderNum,
+				Order: badOrderNum,
 				Sum:   1.0,
 			},
 			codeWant: http.StatusUnprocessableEntity,
@@ -94,12 +88,4 @@ func testWithdraw(t *testing.T) {
 
 		require.Equal(t, test.codeWant, code, test.name)
 	}
-
-	resp, code := get(context.Background(), "withdrawals", token, t)
-	require.Equal(t, http.StatusOK, code, testName)
-
-	var w withdrawals
-	err := json.Unmarshal(resp, &w)
-	require.NoError(t, err, testName)
-	require.NotEmpty(t, w, testName)
 }

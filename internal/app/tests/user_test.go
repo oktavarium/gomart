@@ -50,8 +50,8 @@ func testUser(t *testing.T) {
 			tokenWant: true,
 		},
 		{
-			name:      "login valid user",
-			method:    "login",
+			name:      "register valid user",
+			method:    "register",
 			ct:        "application/json",
 			body:      userJimmy,
 			codeWant:  http.StatusOK,

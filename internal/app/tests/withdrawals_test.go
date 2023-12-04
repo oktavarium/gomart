@@ -10,7 +10,7 @@ import (
 )
 
 func testWithdrawals(t *testing.T) {
-	testName := "login user for witdrawals"
+	testName := "login user for withdrawals"
 	_, code, tokenAndrew := post(
 		context.Background(),
 		"login",
@@ -77,10 +77,10 @@ func testWithdrawals(t *testing.T) {
 		require.Equal(t, test.codeWant, code, test.name)
 
 		if test.bodyWant {
-			var w withdrawals
+			var w []withdrawals
 			err := json.Unmarshal(resp, &w)
-			require.NoError(t, err, testName)
-			require.NotEmpty(t, w, testName)
+			require.NoError(t, err, test.name)
+			require.NotEmpty(t, w, test.name)
 		}
 	}
 }

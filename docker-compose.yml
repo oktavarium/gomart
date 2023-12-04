@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   postgres:
-    container_name: martdb
+    container_name: marketdb
     image: postgres:13.3
     ports:
       - "5432:5432"
@@ -22,6 +22,8 @@ services:
     build:
       context: .
       dockerfile: cmd/gophermart/Dockerfile
+    environment:
+      - TEST_MODE=$TEST_MODE
     env_file: .env
   client:
     container_name: client
@@ -32,6 +34,8 @@ services:
     build:
       context: .
       dockerfile: internal/app/tests/Dockerfile
+    environment:
+      - TEST_MODE=$TEST_MODE
     env_file: .env
 
 

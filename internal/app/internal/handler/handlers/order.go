@@ -18,6 +18,7 @@ func (h *Handlers) MakeOrder(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	if r.Header.Get("Content-Type") != "text/plain" {
+		err = fmt.Errorf("wrong content type")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

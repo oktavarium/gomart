@@ -67,7 +67,8 @@ func (s *ChiRouter) Run() error {
 	server := &http.Server{Addr: s.addr, Handler: s}
 	go func() {
 		<-s.ctx.Done()
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		s.logger.Debug("context is done... exiting")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		if err := server.Shutdown(ctx); err != nil {
 			s.logger.Error(fmt.Errorf("error on server shutdown: %w", err))

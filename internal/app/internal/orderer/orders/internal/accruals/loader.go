@@ -7,13 +7,13 @@ import (
 )
 
 func (a *Accruals) startLoader(ctx context.Context, bufferSize uint) <-chan string {
-	unproccessedOrders, err := a.storage.GetOrdersByStatus(ctx, []string{NEW, PROCESSING})
+	unprocessedOrders, err := a.storage.GetOrdersByStatus(ctx, []string{NEW, PROCESSING})
 	if err != nil {
 		a.logger.Error(fmt.Errorf("error on getting orders by status: %w", err))
 	}
 
 	outCh := make(chan string, bufferSize)
-	for _, order := range unproccessedOrders {
+	for _, order := range unprocessedOrders {
 		outCh <- order
 	}
 
@@ -26,13 +26,12 @@ func (a *Accruals) startLoader(ctx context.Context, bufferSize uint) <-chan stri
 				close(outCh)
 				return
 			default:
-				a.logger.Info("LOADING PROCESSING MESSAGES")
-				unproccessedOrders, err := a.storage.GetOrdersByStatus(a.ctx, []string{PROCESSING})
+				unprocessedOrders, err := a.storage.GetOrdersByStatus(a.ctx, []string{PROCESSING})
 				if err != nil {
 					a.logger.Error(fmt.Errorf("error on getting orders by status: %w", err))
 					continue
 				}
-				for _, order := range unproccessedOrders {
+				for _, order := range unprocessedOrders {
 					outCh <- order
 				}
 			}

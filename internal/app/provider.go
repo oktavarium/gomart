@@ -50,10 +50,11 @@ func newServiceProvider(ctx context.Context) (*serviceProvider, error) {
 	}
 
 	sp.authenticatorer = authenticator.NewAuthenticator(sp.logger, sp.configer.DatabaseURI(), sp.storager)
-
 	if sp.configer.TestMode() {
+		sp.logger.Debug("TESTMODE")
 		sp.pointstore = pointmock.NewPointmock(sp.logger)
 	} else {
+		sp.logger.Debug("NOTESTMODE")
 		sp.pointstore = pointstore.NewPointStore(sp.logger, sp.configer.AccrualAddress())
 	}
 

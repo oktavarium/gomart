@@ -35,8 +35,8 @@ func NewAccruals(
 		storage: storage,
 	}
 
-	unproccessedOrdersCh := accruals.startLoader(ctx, bufferSize)
-	pointsCh := accruals.startExecutor(fanIn(ordersCh, unproccessedOrdersCh), bufferSize)
+	unprocessedOrdersCh := accruals.startLoader(ctx, bufferSize)
+	pointsCh := accruals.startExecutor(fanIn(ordersCh, unprocessedOrdersCh), bufferSize)
 
 	accruals.startUpdater(pointsCh)
 

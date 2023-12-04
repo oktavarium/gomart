@@ -65,6 +65,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 
 	var u user
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		h.logger.Debug("error on decoding body")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
